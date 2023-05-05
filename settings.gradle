@@ -1,0 +1,6 @@
+rootProject.name = 'collector'
+
+include 'api'
+include 'common'
+include 'dao'
+
