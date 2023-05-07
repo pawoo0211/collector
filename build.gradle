@@ -10,3 +10,8 @@ subprojects {
 	}
 }
 
+project(':api') {
+	dependencies {
+		implementation project (':common')
+	}
+}
