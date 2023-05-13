@@ -1,4 +1,4 @@
-package com.techblog.api.mock.out;
+package com.techblog.api.post.out;
 
 public class DeletePostOut {
 

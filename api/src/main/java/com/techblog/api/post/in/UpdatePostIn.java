@@ -1,6 +1,6 @@
-package com.techblog.api.mock.in;
+package com.techblog.api.post.in;
 
-public class CollectPostIn {
+public class UpdatePostIn {
 
     public String title;
     public String content;

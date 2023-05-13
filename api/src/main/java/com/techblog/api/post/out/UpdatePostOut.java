@@ -1,6 +1,6 @@
-package com.techblog.api.mock.out;
+package com.techblog.api.post.out;
 
-public class CollectPostOut {
+public class UpdatePostOut {
 
     private String id;
 
@@ -8,7 +8,7 @@ public class CollectPostOut {
         return id;
     }
 
-    public CollectPostOut(String id) {
+    public UpdatePostOut(String id) {
         this.id = id;
     }
 }
