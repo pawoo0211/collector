@@ -38,7 +38,7 @@ test {
 }
 
 ext {
-    profile = (!project.hasProperty('profile') || !profile) ? 'local' : profile
+    profile = (!project.hasProperty('profile') || !profile) ? 'dev' : profile
 }
 
 sourceSets {
