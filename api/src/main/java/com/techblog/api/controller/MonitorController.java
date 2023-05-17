@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/monitor")
 public class MonitorController {
 
-  @GetMapping("/ping")
-  public ResponseEntity healthCheck() {
-    return ResponseEntity.ok("pong");
-  }
+    @GetMapping("/ping")
+    public ResponseEntity healthCheck() {
+        return ResponseEntity.ok("pong");
+    }
 
 }

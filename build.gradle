@@ -5,10 +5,12 @@ subprojects {
 	apply plugin: 'java'
 
 	dependencies {
-		// lombok
-
 		compileOnly group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
+	}
+}
 
-
+project(':api') {
+	dependencies {
+		implementation project (':common')
 	}
 }
