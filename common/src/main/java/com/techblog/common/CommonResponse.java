@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class CommonResponse<T> {
+
     private final Boolean isSuccess;
     private Integer resultCode;
     private Integer totalCount;
