@@ -12,11 +12,11 @@ public class PostController {
 
     @PostMapping("/collect")
     public CommonResponse collectPost(@RequestBody CollectPostIn collectPostIn) {
-        return CommonResponse.ok(new CollectPostOut("1"));
+        return CommonResponse.ok(10, new CollectPostOut("1"));
     }
 
     @GetMapping("/search")
     public CommonResponse searchPost(@RequestParam("keyword") String keyword) {
-        return CommonResponse.ok(new SearchPostOut("https://d2.naver.com/home"));
+        return CommonResponse.ok(2, new SearchPostOut("https://d2.naver.com/home"));
     }
 }
