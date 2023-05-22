@@ -7,17 +7,17 @@ public class CommonResponse<T> {
 
     private final Boolean isSuccess;
     private Integer resultCode;
-    private Integer totalCount;
+    private String resultMessage;
     private final T out;
 
-    private CommonResponse(Boolean isSuccess, Integer resultCode, Integer totalCount, T out) {
+    private CommonResponse(Boolean isSuccess, Integer resultCode, String resultMessage, T out) {
         this.isSuccess = isSuccess;
         this.resultCode = resultCode;
-        this.totalCount = totalCount;
+        this.resultMessage = resultMessage;
         this.out = out;
     }
 
-    public static <T> CommonResponse ok(Integer totalCount,  T out) {
-        return new CommonResponse(true, 00, totalCount, out);
+    public static <T> CommonResponse ok(Integer resultCode, String resultMessage, T out) {
+        return new CommonResponse(true, resultCode, resultMessage, out);
     }
 }
