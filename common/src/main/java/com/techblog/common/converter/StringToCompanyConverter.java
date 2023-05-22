@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class StringToCompanyConverter implements Converter<String, Company> {
 
     @Override
-    public Company convert(String companyName) {
-        return Company.valueOf(companyName);
+    public Company convert(String company) {
+        return Company.valueOf(company);
     }
 }

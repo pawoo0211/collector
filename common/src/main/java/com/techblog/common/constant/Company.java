@@ -9,5 +9,6 @@ public enum Company {
 
     NAVER("NAVER");
 
-    private String name;
+    private final String name;
+
 }

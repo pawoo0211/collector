@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class CollectPostIn<T> {
 
-    public Company company;
-    public T data;
+    private Company company;
+    private T data;
 
 }
