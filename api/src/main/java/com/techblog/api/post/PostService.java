@@ -1,18 +1,24 @@
 package com.techblog.api.post;
 
+import com.techblog.api.post.domain.CollectManager;
 import com.techblog.api.post.in.CollectPostIn;
 import com.techblog.api.post.model.SearchVo;
 import com.techblog.api.post.out.CollectPostOut;
 import com.techblog.api.post.out.SearchPostOut;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
 
+    private final CollectManager collectManager;
+
     public CollectPostOut collectPost(CollectPostIn collectPostIn) {
+        collectManager.collect(collectPostIn);
 
         return CollectPostOut.builder()
                 .checkUpdate(Boolean.FALSE)
