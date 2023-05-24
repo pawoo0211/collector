@@ -4,8 +4,10 @@ import com.techblog.common.constant.Company;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface Collector {
+public interface Collector<T> {
 
-    public void savePost(Object data);
+    public T toPostInfo(String url);
+    public void savePost(T postInfo);
     public Company getCompany();
+
 }

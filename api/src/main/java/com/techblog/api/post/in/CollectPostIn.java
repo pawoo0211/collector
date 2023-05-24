@@ -4,9 +4,9 @@ import com.techblog.common.constant.Company;
 import lombok.Getter;
 
 @Getter
-public class CollectPostIn<T> {
+public class CollectPostIn {
 
     private Company company;
-    private T data;
+    private String url;
 
 }
