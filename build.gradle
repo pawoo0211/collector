@@ -12,5 +12,6 @@ subprojects {
 project(':api') {
 	dependencies {
 		implementation project (':common')
+		implementation project (':dao')
 	}
 }

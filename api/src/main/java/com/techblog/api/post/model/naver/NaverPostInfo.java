@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class NaverPost {
+public class NaverPostInfo {
 
     @JsonProperty(value = "links")
     private List<NaverLinks> naverLinks;
@@ -21,7 +21,7 @@ public class NaverPost {
     private NaverPage naverPages;
 
     @Builder
-    public NaverPost(List<NaverLinks> naverLinks, List<NaverContent> naverContents, NaverPage naverPages) {
+    public NaverPostInfo(List<NaverLinks> naverLinks, List<NaverContent> naverContents, NaverPage naverPages) {
         this.naverLinks = naverLinks;
         this.naverContents = naverContents;
         this.naverPages = naverPages;
