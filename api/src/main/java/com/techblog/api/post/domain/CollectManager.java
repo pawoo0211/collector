@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -40,8 +41,8 @@ public class CollectManager<T> implements InitializingBean {
     public void collect(CollectPostIn collectPostIn) {
         log.info("[CollectManager] company : {}", collectPostIn.getCompany());
         Collector collector = collectorMap.get(collectPostIn.getCompany());
-        T postInfo = (T) collector.toPostInfo(collectPostIn.getUrl());
-        log.info("[CollectManager] postInfo`s Class : {}", postInfo.getClass().getName());
+        List<T> postInfo = collector.toPostInfo(collectPostIn.getCompany());
+        log.info("[CollectManager] postInfo`s Class : {}", postInfo.getClass().getSimpleName());
         collector.savePost(postInfo);
     }
 }

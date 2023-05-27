@@ -2,6 +2,7 @@ package com.techblog.api.post.domain;
 
 import com.techblog.common.constant.Company;
 import org.springframework.stereotype.Component;
+import java.util.List;
 
 @Component
 public interface Collector<T> {
@@ -12,9 +13,8 @@ public interface Collector<T> {
      * 제네릭으로 반환하지 말기
      * PostInfo toPostInfo
      */
-    public T toPostInfo(String url);
-
-    public void savePost(T postInfo);
+    public List<T> toPostInfo(Company company);
+    public void savePost(List<T> postInfo);
     public Company getCompany();
 
 }
