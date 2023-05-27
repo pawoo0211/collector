@@ -6,8 +6,8 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.List;
 
-@AllArgsConstructor
 @Getter
+@AllArgsConstructor
 public enum Company {
 
     NAVER("NAVER", Arrays.asList("https://d2.naver.com/api/v1/contents?categoryId=2&page=0&size=20",
