@@ -1,9 +1,9 @@
-package com.techblog.api.post.model.naver;
+package com.techblog.api.post.model.naver.external;
 
 import lombok.Getter;
 
 @Getter
-public class NaverPage {
+public class Page {
 
     private Integer size;
     private Integer totalElements;

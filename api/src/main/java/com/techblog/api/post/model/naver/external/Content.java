@@ -1,15 +1,15 @@
-package com.techblog.api.post.model.naver;
+package com.techblog.api.post.model.naver.external;
 
 import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class NaverContent {
+public class Content {
 
     private String postTitle;
     private String postImage;
     private String postHtml;
-    private Long postPublishedAt;
+    private long postPublishedAt;
     private String url;
     private Integer viewCount;
     private String author;

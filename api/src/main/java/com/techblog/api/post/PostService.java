@@ -21,7 +21,6 @@ public class PostService {
         collectManager.collect(collectPostIn);
 
         return CollectPostOut.builder()
-                .checkUpdate(Boolean.FALSE)
                 .totalCount(100)
                 .executedTime(10000L)
                 .build();

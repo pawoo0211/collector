@@ -1,7 +1,10 @@
 package com.techblog.api.post.domain.naver;
 
 import com.techblog.api.post.domain.Collector;
-import com.techblog.api.post.model.naver.NaverPostInfo;
+import com.techblog.api.post.model.naver.external.Content;
+import com.techblog.api.post.model.naver.internal.InternalContent;
+import com.techblog.api.post.model.naver.internal.InternalNaverPostInfo;
+import com.techblog.api.post.model.naver.external.ExternalNaverPostInfo;
 import com.techblog.common.constant.Company;
 import com.techblog.dao.document.PostEntity;
 import com.techblog.dao.repository.PostRepository;
@@ -34,46 +37,29 @@ public class NaverCollector<T> implements Collector<T> {
     public List<T> toPostInfo(Company company) {
         log.info("[NaverCollector] toPostInfo method is started");
         List<String> naverPostUrlList= company.getUrlList();
-        List<NaverPostInfo> naverPostInfoList = new ArrayList<>();
+        List<ExternalNaverPostInfo> externalNaverPostInfoList = new ArrayList<>();
 
         /**
          * TODO
          * WebClient로 리팩터링하기
          */
-
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders header = new HttpHeaders();
         HttpEntity<?> entity = new HttpEntity<>(header);
 
-        /**
-         * TODO
-         * 1. 응답 받는 것 중에 필요 없는 것들(NULL)인 것들은 없애기
-         * EX) links ...
-         * 2. 응답 받는 것을 List로 감싸고 for문 돌면서 저장하기
-         */
-
-        for (String url : naverPostUrlList ) {
-            ResponseEntity<NaverPostInfo> responseEntity = restTemplate.exchange(url,
+        for (String url : naverPostUrlList) {
+            ResponseEntity<ExternalNaverPostInfo> responseEntity = restTemplate.exchange(url,
                     HttpMethod.GET,
                     entity,
-                    NaverPostInfo.class);
+                    ExternalNaverPostInfo.class);
 
-            /**
-             * TODO
-             * naverPostInfo를 두개로 분리하기
-             * 1. 네이버에서 응답 받은 값 = NaverPostInfoResponse
-             * 2. 네이버에서 응답 받은 값을 내부에서 사용하는 DTO = NaverPostInfo
-             * -> 즉 객체를 분리해서 네이버에 종속 되는 것을 막기
-             *
-             */
-
-            NaverPostInfo naverPostInfo = NaverPostInfo.builder()
-                    .naverLinks(responseEntity.getBody().getNaverLinks())
-                    .naverContents(responseEntity.getBody().getNaverContents())
-                    .naverPages(responseEntity.getBody().getNaverPages())
+            ExternalNaverPostInfo externalNaverPostInfo = ExternalNaverPostInfo.builder()
+                    .links(responseEntity.getBody().getLinks())
+                    .content(responseEntity.getBody().getContent())
+                    .page(responseEntity.getBody().getPage())
                     .build();
 
-            naverPostInfoList.add(naverPostInfo);
+            externalNaverPostInfoList.add(externalNaverPostInfo);
         }
 
         /**
@@ -82,7 +68,7 @@ public class NaverCollector<T> implements Collector<T> {
          * 여기서 이렇게 제네릭으로 다시 타입 캐스팅 하는 것은 제네릭을 완전히 잘못 사용하고 있는 상태 -> 변경
          * */
 
-        return (List<T>) naverPostInfoList;
+        return (List<T>) externalNaverPostInfoList;
     }
 
     @Override
@@ -94,30 +80,49 @@ public class NaverCollector<T> implements Collector<T> {
          * NaverPostInfo -> 내부적으로 사용하는 NaverPostInfo 객체
          * NaverPostInfoResponse -> 외부와 통신해서 받은 NaverPostInfo 객체
          */
-        List<NaverPostInfo> naverPostInfoList = (List<NaverPostInfo>) postInfo;
+        List<ExternalNaverPostInfo> externalNaverPostInfoList = (List<ExternalNaverPostInfo>) postInfo;
 
-        for (NaverPostInfo naverPostInfo : naverPostInfoList) {
-
-            /**
-             * TODO
-             * GET을 연달아 호출하는 것은 좋은 방식이 아님 -> 변경
-             */
-            PostEntity naverPost = PostEntity.builder()
-                    .title(naverPostInfo.getNaverContents().get(0).getPostTitle())
-                    .href(naverPostInfo.getNaverLinks().get(0).getHref())
-                    .build();
+        for (ExternalNaverPostInfo externalNaverPostInfo : externalNaverPostInfoList) {
+            InternalNaverPostInfo internalNaverPostInfo = toInternalNaverPostInfo(externalNaverPostInfo);
 
             /**
              * TODO
-             * 1. 발행일자를 체크해서 발행일자 이후의 글 들만 저장하기
+             * - 발행일자를 체크해서 발행일자 이후의 글 들만 저장하기
              */
-            postRepository.save(naverPost);
-            log.info("[NaverCollector] savePost`s result : {}", postRepository.findByPostId(naverPost.getPostId()));
+            for (InternalContent internalContent : internalNaverPostInfo.getContent()) {
+                PostEntity naverPost = PostEntity.builder()
+                        .title(internalContent.getPostTitle())
+                        .url(internalContent.getUrl())
+                        .build();
+
+                postRepository.save(naverPost);
+                PostEntity foundNaverPost = postRepository.findByPostId(naverPost.getPostId());
+                log.info("[NaverCollector] savePost`s result : {}", foundNaverPost.getTitle());
+            }
         }
     }
 
     @Override
     public Company getCompany() {
         return Company.NAVER;
+    }
+
+    private InternalNaverPostInfo toInternalNaverPostInfo(ExternalNaverPostInfo externalNaverPostInfo) {
+        List<Content> externalContentList = externalNaverPostInfo.getContent();
+        List<InternalContent> internalContentList = new ArrayList<>();
+
+        for (Content externalContent : externalContentList) {
+            InternalContent internalContent = InternalContent.builder()
+                    .postTitle(externalContent.getPostTitle())
+                    .postPublishedAt(externalContent.getPostPublishedAt())
+                    .url(externalContent.getUrl())
+                    .build();
+
+            internalContentList.add(internalContent);
+        }
+
+        return InternalNaverPostInfo.builder()
+                .content(internalContentList)
+                .build();
     }
 }

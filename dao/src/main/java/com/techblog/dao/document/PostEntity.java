@@ -13,11 +13,11 @@ public class PostEntity {
     @Id
     private String postId;
     private String title;
-    private String href;
+    private String url;
 
     @Builder
-    public PostEntity(String title, String href) {
+    public PostEntity(String title, String url) {
         this.title = title;
-        this.href = href;
+        this.url = url;
     }
 }

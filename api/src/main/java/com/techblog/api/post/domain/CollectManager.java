@@ -42,7 +42,7 @@ public class CollectManager<T> implements InitializingBean {
         log.info("[CollectManager] company : {}", collectPostIn.getCompany());
         Collector collector = collectorMap.get(collectPostIn.getCompany());
         List<T> postInfo = collector.toPostInfo(collectPostIn.getCompany());
-        log.info("[CollectManager] postInfo`s Class : {}", postInfo.getClass().getSimpleName());
+        log.info("[CollectManager] postInfo`s Class : {}", postInfo.getClass().getTypeName());
         collector.savePost(postInfo);
     }
 }
