@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface PostRepository extends MongoRepository<PostEntity, String> {
 
     PostEntity findByPostId(String postId);
+    int countByCompanyName(String companyName);
+
 }

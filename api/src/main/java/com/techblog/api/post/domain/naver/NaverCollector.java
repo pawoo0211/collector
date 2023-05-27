@@ -1,6 +1,7 @@
 package com.techblog.api.post.domain.naver;
 
 import com.techblog.api.post.domain.Collector;
+import com.techblog.api.post.model.PostInfo;
 import com.techblog.api.post.model.naver.external.Content;
 import com.techblog.api.post.model.naver.internal.InternalContent;
 import com.techblog.api.post.model.naver.internal.InternalNaverPostInfo;
@@ -28,20 +29,19 @@ import java.util.List;
  * TODO
  * NaverCollecotr implements Collector<NaverPostInfo>
  */
-
-public class NaverCollector<T> implements Collector<T> {
+public class NaverCollector implements Collector {
 
     private final PostRepository postRepository;
 
     @Override
-    public List<T> toPostInfo(Company company) {
+    public List<PostInfo> toPostInfo(Company company) {
         log.info("[NaverCollector] toPostInfo method is started");
         List<String> naverPostUrlList= company.getUrlList();
-        List<ExternalNaverPostInfo> externalNaverPostInfoList = new ArrayList<>();
+        List<PostInfo> externalNaverPostInfoList = new ArrayList<>();
 
         /**
          * TODO
-         * WebClient로 리팩터링하기
+         * - WebClient로 리팩터링하기
          */
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders header = new HttpHeaders();
@@ -62,29 +62,22 @@ public class NaverCollector<T> implements Collector<T> {
             externalNaverPostInfoList.add(externalNaverPostInfo);
         }
 
-        /**
-         * TODO
-         * 여기서 제네릭 인터페이스를 만들어서 NaverPostInfo
-         * 여기서 이렇게 제네릭으로 다시 타입 캐스팅 하는 것은 제네릭을 완전히 잘못 사용하고 있는 상태 -> 변경
-         * */
-
-        return (List<T>) externalNaverPostInfoList;
+        return externalNaverPostInfoList;
     }
 
     @Override
-    public void savePost(List<T> postInfo) {
+    public void savePost(List<PostInfo> externalNaverPostInfoList) {
         log.info("[NaverCollector] savePost method is started");
-        /**
-         * TODO
-         * 제네릭을 사용할 때 아래와 같이 타입 캐스팅을 하면 안됨
-         */
-        List<ExternalNaverPostInfo> externalNaverPostInfoList = (List<ExternalNaverPostInfo>) postInfo;
         InternalNaverPostInfo internalNaverPostInfo = null;
         List<InternalContent> internalContentList;
         List<InternalContent> rightInternalContentList = null;
 
-        for (ExternalNaverPostInfo externalNaverPostInfo : externalNaverPostInfoList) {
-            internalNaverPostInfo = toInternalNaverPostInfo(externalNaverPostInfo);
+        for (PostInfo externalNaverPostInfo : externalNaverPostInfoList) {
+            /**
+             * TODO
+             * - 해당 라인에서 타입 캐스팅이 진행 되는 상태 -> 수정 예정
+             */
+            internalNaverPostInfo = toInternalNaverPostInfo((ExternalNaverPostInfo) externalNaverPostInfo);
         }
 
         if (internalNaverPostInfo != null) {
@@ -126,6 +119,11 @@ public class NaverCollector<T> implements Collector<T> {
         InternalContent standardizedContent = internalContentList.get(0);
         long standardizedPostPublishedAt = standardizedContent.getPostPublishedAt();
 
+        if (postRepository.countByCompanyName(Company.NAVER.getName()) == 0) {
+            log.info("[NaverCollector] Total naver post count is 0");
+            return internalContentList;
+        }
+
         for (InternalContent internalContent : internalContentList) {
             if (internalContent.getPostPublishedAt() < standardizedPostPublishedAt) {
                 continue;
@@ -142,6 +140,7 @@ public class NaverCollector<T> implements Collector<T> {
     private void saveRightContent(List<InternalContent> rightInternalContentList) {
         for (InternalContent rightContent : rightInternalContentList) {
             PostEntity naverPost = PostEntity.builder()
+                    .companyName(Company.NAVER.getName())
                     .title(rightContent.getPostTitle())
                     .url(rightContent.getUrl())
                     .build();
