@@ -77,27 +77,22 @@ public class NaverCollector<T> implements Collector<T> {
         /**
          * TODO
          * 제네릭을 사용할 때 아래와 같이 타입 캐스팅을 하면 안됨
-         * NaverPostInfo -> 내부적으로 사용하는 NaverPostInfo 객체
-         * NaverPostInfoResponse -> 외부와 통신해서 받은 NaverPostInfo 객체
          */
         List<ExternalNaverPostInfo> externalNaverPostInfoList = (List<ExternalNaverPostInfo>) postInfo;
+        InternalNaverPostInfo internalNaverPostInfo = null;
+        List<InternalContent> internalContentList;
+        List<InternalContent> rightInternalContentList = null;
 
         for (ExternalNaverPostInfo externalNaverPostInfo : externalNaverPostInfoList) {
-            InternalNaverPostInfo internalNaverPostInfo = toInternalNaverPostInfo(externalNaverPostInfo);
+            internalNaverPostInfo = toInternalNaverPostInfo(externalNaverPostInfo);
+        }
 
-            /**
-             * TODO
-             * - 발행일자를 체크해서 발행일자 이후의 글 들만 저장하기
-             */
-            for (InternalContent internalContent : internalNaverPostInfo.getContent()) {
-                PostEntity naverPost = PostEntity.builder()
-                        .title(internalContent.getPostTitle())
-                        .url(internalContent.getUrl())
-                        .build();
+        if (internalNaverPostInfo != null) {
+            internalContentList = internalNaverPostInfo.getContent();
 
-                postRepository.save(naverPost);
-                PostEntity foundNaverPost = postRepository.findByPostId(naverPost.getPostId());
-                log.info("[NaverCollector] savePost`s result : {}", foundNaverPost.getTitle());
+            if (internalContentList.size() > 0) {
+                rightInternalContentList = SavePossibilityContent(internalContentList);
+                saveRightContent(rightInternalContentList);
             }
         }
     }
@@ -124,5 +119,36 @@ public class NaverCollector<T> implements Collector<T> {
         return InternalNaverPostInfo.builder()
                 .content(internalContentList)
                 .build();
+    }
+
+    private List<InternalContent> SavePossibilityContent(List<InternalContent> internalContentList) {
+        List<InternalContent> rightInternalContentList = new ArrayList<>();
+        InternalContent standardizedContent = internalContentList.get(0);
+        long standardizedPostPublishedAt = standardizedContent.getPostPublishedAt();
+
+        for (InternalContent internalContent : internalContentList) {
+            if (internalContent.getPostPublishedAt() < standardizedPostPublishedAt) {
+                continue;
+            }
+
+            rightInternalContentList.add(internalContent);
+        }
+
+        rightInternalContentList.remove(0);
+
+        return rightInternalContentList;
+    }
+
+    private void saveRightContent(List<InternalContent> rightInternalContentList) {
+        for (InternalContent rightContent : rightInternalContentList) {
+            PostEntity naverPost = PostEntity.builder()
+                    .title(rightContent.getPostTitle())
+                    .url(rightContent.getUrl())
+                    .build();
+
+            postRepository.save(naverPost);
+            PostEntity foundNaverPost = postRepository.findByPostId(naverPost.getPostId());
+            log.info("[NaverCollector] savePost`s result : {}", foundNaverPost.getTitle());
+        }
     }
 }
