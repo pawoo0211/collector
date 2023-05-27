@@ -15,6 +15,12 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+
+
+/**
+ * TODO
+ * public class CollectManager implements InitializingBean
+ */
 public class CollectManager<T> implements InitializingBean {
 
     private final ApplicationContext applicationContext;
