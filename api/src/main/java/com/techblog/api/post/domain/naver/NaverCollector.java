@@ -3,8 +3,8 @@ package com.techblog.api.post.domain.naver;
 import com.techblog.api.post.domain.Collector;
 import com.techblog.api.post.model.naver.NaverPostInfo;
 import com.techblog.common.constant.Company;
-import com.techblog.dao.document.NaverPostEntity;
-import com.techblog.dao.repository.NaverPostRepository;
+import com.techblog.dao.document.PostEntity;
+import com.techblog.dao.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -25,7 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 public class NaverCollector<T> implements Collector<T> {
 
-    private final NaverPostRepository naverPostRepository;
+    private final PostRepository postRepository;
 
     @Override
     public T toPostInfo(String url) {
@@ -87,7 +87,7 @@ public class NaverCollector<T> implements Collector<T> {
          * TODO
          * GET을 연달아 호출하는 것은 좋은 방식이 아님 -> 변경
          */
-        NaverPostEntity naverPost = NaverPostEntity.builder()
+        PostEntity naverPost = PostEntity.builder()
                 .title(naverPostInfo.getNaverContents().get(0).getPostTitle())
                 .href(naverPostInfo.getNaverLinks().get(0).getHref())
                 .build();
@@ -97,8 +97,8 @@ public class NaverCollector<T> implements Collector<T> {
          * 1. 발행일자를 체크해서 발행일자 이후의 글 들만 저장하기
          */
 
-        naverPostRepository.save(naverPost);
-        log.info("[NaverCollector] savePost`s result : {}", naverPostRepository.findByPostId(naverPost.getPostId()));
+        postRepository.save(naverPost);
+        log.info("[NaverCollector] savePost`s result : {}", postRepository.findByPostId(naverPost.getPostId()));
     }
 
     @Override

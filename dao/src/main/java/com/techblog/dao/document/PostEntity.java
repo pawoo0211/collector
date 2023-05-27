@@ -6,14 +6,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 
-/**
- * TODO
- * collection 네이밍은 소문자 -> ex) naver, ...
- */
-
-@Document(collection = "NAVER")
+@Document(collection = "post")
 @Getter
-public class NaverPostEntity {
+public class PostEntity {
 
     @Id
     private String postId;
@@ -21,7 +16,7 @@ public class NaverPostEntity {
     private String href;
 
     @Builder
-    public NaverPostEntity(String title, String href) {
+    public PostEntity(String title, String href) {
         this.title = title;
         this.href = href;
     }
