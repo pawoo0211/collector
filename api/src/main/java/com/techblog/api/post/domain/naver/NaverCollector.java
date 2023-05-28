@@ -7,16 +7,12 @@ import com.techblog.api.post.model.naver.internal.InternalContent;
 import com.techblog.api.post.model.naver.internal.InternalNaverPostInfo;
 import com.techblog.api.post.model.naver.external.ExternalNaverPostInfo;
 import com.techblog.common.constant.Company;
+import com.techblog.common.webclient.DataCommunication;
 import com.techblog.dao.document.PostEntity;
 import com.techblog.dao.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,41 +20,19 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-
-/**
- * TODO
- * NaverCollecotr implements Collector<NaverPostInfo>
- */
 public class NaverCollector implements Collector {
 
     private final PostRepository postRepository;
+    private final DataCommunication dataCommunication;
 
     @Override
     public List<PostInfo> toPostInfo(Company company) {
-        log.info("[NaverCollector] toPostInfo method is started");
         List<String> naverPostUrlList= company.getUrlList();
         List<PostInfo> externalNaverPostInfoList = new ArrayList<>();
 
-        /**
-         * TODO
-         * - WebClient로 리팩터링하기
-         */
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders header = new HttpHeaders();
-        HttpEntity<?> entity = new HttpEntity<>(header);
-
+        log.info("[NaverCollector] Data communication is started");
         for (String url : naverPostUrlList) {
-            ResponseEntity<ExternalNaverPostInfo> responseEntity = restTemplate.exchange(url,
-                    HttpMethod.GET,
-                    entity,
-                    ExternalNaverPostInfo.class);
-
-            ExternalNaverPostInfo externalNaverPostInfo = ExternalNaverPostInfo.builder()
-                    .links(responseEntity.getBody().getLinks())
-                    .content(responseEntity.getBody().getContent())
-                    .page(responseEntity.getBody().getPage())
-                    .build();
-
+            ExternalNaverPostInfo externalNaverPostInfo = dataCommunication.getHttpCall(url, ExternalNaverPostInfo.class);
             externalNaverPostInfoList.add(externalNaverPostInfo);
         }
 
