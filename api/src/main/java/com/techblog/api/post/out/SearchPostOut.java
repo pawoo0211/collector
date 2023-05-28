@@ -1,14 +1,15 @@
 package com.techblog.api.post.out;
 
+import com.techblog.api.post.model.SearchVo;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
 public class SearchPostOut {
 
-    private String url;
+    private List<SearchVo> searchVoList;
 
-    public SearchPostOut(String url) {
-        this.url = url;
-    }
-
-    public String getUrl() {
-        return url;
-    }
 }

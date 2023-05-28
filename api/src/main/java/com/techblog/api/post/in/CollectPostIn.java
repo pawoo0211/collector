@@ -1,20 +1,11 @@
 package com.techblog.api.post.in;
 
+import com.techblog.common.constant.Company;
+import lombok.Getter;
+
+@Getter
 public class CollectPostIn {
 
-    public String title;
-    public String content;
-    public String url;
+    private Company company;
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public String getUrl() {
-        return url;
-    }
 }

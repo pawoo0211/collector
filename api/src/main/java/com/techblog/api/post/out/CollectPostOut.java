@@ -1,14 +1,17 @@
 package com.techblog.api.post.out;
 
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
 public class CollectPostOut {
 
-    private String id;
+    private Integer totalCount;
+    private Long executedTime;
 
-    public String getId() {
-        return id;
-    }
-
-    public CollectPostOut(String id) {
-        this.id = id;
+    @Builder
+    public CollectPostOut(Integer totalCount, Long executedTime) {
+        this.totalCount = totalCount;
+        this.executedTime = executedTime;
     }
 }
