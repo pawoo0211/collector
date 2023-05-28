@@ -68,23 +68,30 @@ public class NaverCollector implements Collector {
     @Override
     public void savePost(List<PostInfo> externalNaverPostInfoList) {
         log.info("[NaverCollector] savePost method is started");
-        InternalNaverPostInfo internalNaverPostInfo = null;
+        List<InternalNaverPostInfo> internalNaverPostInfoList = new ArrayList<>();
         List<InternalContent> internalContentList;
-        List<InternalContent> rightInternalContentList = null;
+        List<InternalContent> rightInternalContentList;
 
         for (PostInfo externalNaverPostInfo : externalNaverPostInfoList) {
             /**
              * TODO
              * - 해당 라인에서 타입 캐스팅이 진행 되는 상태 -> 수정 예정
              */
-            internalNaverPostInfo = toInternalNaverPostInfo((ExternalNaverPostInfo) externalNaverPostInfo);
+            InternalNaverPostInfo internalNaverPostInfo = toInternalNaverPostInfo((ExternalNaverPostInfo) externalNaverPostInfo);
+            internalNaverPostInfoList.add(internalNaverPostInfo);
         }
 
-        if (internalNaverPostInfo != null) {
-            internalContentList = internalNaverPostInfo.getContent();
-
-            if (internalContentList.size() > 0) {
+        for (InternalNaverPostInfo internalNaverPostInfo : internalNaverPostInfoList) {
+            if (postRepository.countByCompanyName(Company.NAVER.getName()) == 0) {
+                log.info("[NaverCollector] Total naver post count is 0");
+                for (InternalNaverPostInfo naverPostInfo : internalNaverPostInfoList) {
+                    saveRightContent(naverPostInfo.getContent());
+                }
+                break;
+            } else {
+                internalContentList = internalNaverPostInfo.getContent();
                 rightInternalContentList = SavePossibilityContent(internalContentList);
+
                 saveRightContent(rightInternalContentList);
             }
         }
@@ -118,11 +125,6 @@ public class NaverCollector implements Collector {
         List<InternalContent> rightInternalContentList = new ArrayList<>();
         InternalContent standardizedContent = internalContentList.get(0);
         long standardizedPostPublishedAt = standardizedContent.getPostPublishedAt();
-
-        if (postRepository.countByCompanyName(Company.NAVER.getName()) == 0) {
-            log.info("[NaverCollector] Total naver post count is 0");
-            return internalContentList;
-        }
 
         for (InternalContent internalContent : internalContentList) {
             if (internalContent.getPostPublishedAt() < standardizedPostPublishedAt) {
