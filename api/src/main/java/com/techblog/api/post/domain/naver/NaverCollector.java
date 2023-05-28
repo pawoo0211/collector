@@ -51,7 +51,7 @@ public class NaverCollector implements Collector {
              * TODO
              * - 해당 라인에서 타입 캐스팅이 진행 되는 상태 -> 수정 예정
              */
-            InternalNaverPostInfo internalNaverPostInfo = toInternalNaverPostInfo((ExternalNaverPostInfo) externalNaverPostInfo);
+            InternalNaverPostInfo internalNaverPostInfo = toInternalNaverPostInfo(externalNaverPostInfo);
             internalNaverPostInfoList.add(internalNaverPostInfo);
         }
 
@@ -76,7 +76,7 @@ public class NaverCollector implements Collector {
         return Company.NAVER;
     }
 
-    private InternalNaverPostInfo toInternalNaverPostInfo(ExternalNaverPostInfo externalNaverPostInfo) {
+    private <T extends PostInfo> InternalNaverPostInfo toInternalNaverPostInfo(T externalNaverPostInfo) {
         List<Content> externalContentList = externalNaverPostInfo.getContent();
         List<InternalContent> internalContentList = new ArrayList<>();
 
@@ -104,7 +104,6 @@ public class NaverCollector implements Collector {
             if (internalContent.getPostPublishedAt() < standardizedPostPublishedAt) {
                 continue;
             }
-
             rightInternalContentList.add(internalContent);
         }
 

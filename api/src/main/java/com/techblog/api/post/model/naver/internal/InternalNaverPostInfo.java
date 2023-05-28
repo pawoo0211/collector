@@ -16,8 +16,4 @@ public class InternalNaverPostInfo implements PostInfo {
         this.content = content;
     }
 
-    @Override
-    public InternalNaverPostInfo getPostInfo() {
-        return this;
-    }
 }
