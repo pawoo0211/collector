@@ -6,13 +6,11 @@ import lombok.Getter;
 @Getter
 public class CollectPostOut {
 
-    private Boolean checkUpdate;
     private Integer totalCount;
     private Long executedTime;
 
     @Builder
-    public CollectPostOut(Boolean checkUpdate, Integer totalCount, Long executedTime) {
-        this.checkUpdate = checkUpdate;
+    public CollectPostOut(Integer totalCount, Long executedTime) {
         this.totalCount = totalCount;
         this.executedTime = executedTime;
     }

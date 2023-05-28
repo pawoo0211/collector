@@ -7,6 +7,5 @@ import lombok.Getter;
 public class CollectPostIn {
 
     private Company company;
-    private String url;
 
 }
