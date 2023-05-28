@@ -21,9 +21,4 @@ public class ExternalNaverPostInfo implements PostInfo {
         this.content = content;
         this.page = page;
     }
-
-    @Override
-    public ExternalNaverPostInfo getPostInfo() {
-        return this;
-    }
 }

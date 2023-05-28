@@ -1,7 +1,9 @@
 package com.techblog.api.post.model;
 
-public interface PostInfo<T> {
+import java.util.List;
 
-    public T getPostInfo();
+public interface PostInfo {
+
+    public List getContent();
 
 }
