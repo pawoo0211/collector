@@ -7,10 +7,10 @@ import lombok.Getter;
 public class CollectPostOut {
 
     private Integer totalCount;
-    private Long executedTime;
+    private String executedTime;
 
     @Builder
-    public CollectPostOut(Integer totalCount, Long executedTime) {
+    public CollectPostOut(Integer totalCount, String executedTime) {
         this.totalCount = totalCount;
         this.executedTime = executedTime;
     }

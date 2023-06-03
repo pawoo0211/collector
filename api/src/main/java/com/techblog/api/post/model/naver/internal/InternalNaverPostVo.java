@@ -7,12 +7,12 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class InternalNaverPostInfo implements PostInfo {
+public class InternalNaverPostVo extends PostInfo {
 
     private List<InternalContent> content;
 
     @Builder
-    public InternalNaverPostInfo(List<InternalContent> content) {
+    public InternalNaverPostVo(List<InternalContent> content) {
         this.content = content;
     }
 
