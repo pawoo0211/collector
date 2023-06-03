@@ -2,8 +2,8 @@ package com.techblog.api.post.model;
 
 import java.util.List;
 
-public interface PostInfo {
+public abstract class PostInfo {
 
-    public List getContent();
+    abstract public List getContent();
 
 }

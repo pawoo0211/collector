@@ -9,14 +9,14 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class ExternalNaverPostInfo implements PostInfo {
+public class ExternalNaverPostVo extends PostInfo {
 
     private List<Link> links;
     private List<Content> content;
     private Page page;
 
     @Builder
-    public ExternalNaverPostInfo(List<Link> links, List<Content> content, Page page) {
+    public ExternalNaverPostVo(List<Link> links, List<Content> content, Page page) {
         this.links = links;
         this.content = content;
         this.page = page;

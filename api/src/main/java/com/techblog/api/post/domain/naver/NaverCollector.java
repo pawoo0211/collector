@@ -1,11 +1,12 @@
 package com.techblog.api.post.domain.naver;
 
 import com.techblog.api.post.domain.Collector;
+import com.techblog.api.post.model.CollectResultInfo;
 import com.techblog.api.post.model.PostInfo;
 import com.techblog.api.post.model.naver.external.Content;
 import com.techblog.api.post.model.naver.internal.InternalContent;
-import com.techblog.api.post.model.naver.internal.InternalNaverPostInfo;
-import com.techblog.api.post.model.naver.external.ExternalNaverPostInfo;
+import com.techblog.api.post.model.naver.internal.InternalNaverPostVo;
+import com.techblog.api.post.model.naver.external.ExternalNaverPostVo;
 import com.techblog.common.constant.Company;
 import com.techblog.common.webclient.DataCommunication;
 import com.techblog.dao.document.PostEntity;
@@ -32,43 +33,45 @@ public class NaverCollector implements Collector {
 
         log.info("[NaverCollector] Data communication is started");
         for (String url : naverPostUrlList) {
-            ExternalNaverPostInfo externalNaverPostInfo = dataCommunication.getHttpCall(url, ExternalNaverPostInfo.class);
-            externalNaverPostInfoList.add(externalNaverPostInfo);
+            ExternalNaverPostVo externalNaverPostVo = dataCommunication.getHttpCall(url, ExternalNaverPostVo.class);
+            externalNaverPostInfoList.add(externalNaverPostVo);
         }
 
         return externalNaverPostInfoList;
     }
 
     @Override
-    public void savePost(List<PostInfo> externalNaverPostInfoList) {
+    public CollectResultInfo savePost(List<PostInfo> externalNaverPostInfoList) {
         log.info("[NaverCollector] savePost method is started");
-        List<InternalNaverPostInfo> internalNaverPostInfoList = new ArrayList<>();
+        List<InternalNaverPostVo> internalNaverPostVoList = new ArrayList<>();
         List<InternalContent> internalContentList;
         List<InternalContent> rightInternalContentList;
+        int savedPostCount = 0;
 
         for (PostInfo externalNaverPostInfo : externalNaverPostInfoList) {
-            /**
-             * TODO
-             * - 해당 라인에서 타입 캐스팅이 진행 되는 상태 -> 수정 예정
-             */
-            InternalNaverPostInfo internalNaverPostInfo = toInternalNaverPostInfo(externalNaverPostInfo);
-            internalNaverPostInfoList.add(internalNaverPostInfo);
+            InternalNaverPostVo internalNaverPostVo = toInternalNaverPostInfo(externalNaverPostInfo);
+            internalNaverPostVoList.add(internalNaverPostVo);
         }
 
-        for (InternalNaverPostInfo internalNaverPostInfo : internalNaverPostInfoList) {
+        for (InternalNaverPostVo internalNaverPostVo : internalNaverPostVoList) {
             if (postRepository.countByCompanyName(Company.NAVER.getName()) == 0) {
                 log.info("[NaverCollector] Total naver post count is 0");
-                for (InternalNaverPostInfo naverPostInfo : internalNaverPostInfoList) {
-                    saveRightContent(naverPostInfo.getContent());
+                for (InternalNaverPostVo naverPostInfo : internalNaverPostVoList) {
+                    savedPostCount += saveRightContent(naverPostInfo.getContent());
                 }
                 break;
             } else {
-                internalContentList = internalNaverPostInfo.getContent();
+                internalContentList = internalNaverPostVo.getContent();
                 rightInternalContentList = SavePossibilityContent(internalContentList);
 
-                saveRightContent(rightInternalContentList);
+                savedPostCount += saveRightContent(rightInternalContentList);
             }
         }
+
+        return CollectResultInfo.builder()
+                .savedPostCount(savedPostCount)
+                .executedTime(0L)
+                .build();
     }
 
     @Override
@@ -76,7 +79,7 @@ public class NaverCollector implements Collector {
         return Company.NAVER;
     }
 
-    private <T extends PostInfo> InternalNaverPostInfo toInternalNaverPostInfo(T externalNaverPostInfo) {
+    private <T extends PostInfo> InternalNaverPostVo toInternalNaverPostInfo(T externalNaverPostInfo) {
         List<Content> externalContentList = externalNaverPostInfo.getContent();
         List<InternalContent> internalContentList = new ArrayList<>();
 
@@ -90,7 +93,7 @@ public class NaverCollector implements Collector {
             internalContentList.add(internalContent);
         }
 
-        return InternalNaverPostInfo.builder()
+        return InternalNaverPostVo.builder()
                 .content(internalContentList)
                 .build();
     }
@@ -112,7 +115,9 @@ public class NaverCollector implements Collector {
         return rightInternalContentList;
     }
 
-    private void saveRightContent(List<InternalContent> rightInternalContentList) {
+    private int saveRightContent(List<InternalContent> rightInternalContentList) {
+        int savedPostCount = 0;
+
         for (InternalContent rightContent : rightInternalContentList) {
             PostEntity naverPost = PostEntity.builder()
                     .companyName(Company.NAVER.getName())
@@ -121,8 +126,11 @@ public class NaverCollector implements Collector {
                     .build();
 
             postRepository.save(naverPost);
+            savedPostCount += 1;
             PostEntity foundNaverPost = postRepository.findByPostId(naverPost.getPostId());
             log.info("[NaverCollector] savePost`s result : {}", foundNaverPost.getTitle());
         }
+
+        return savedPostCount;
     }
 }

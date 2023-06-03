@@ -1,6 +1,7 @@
 package com.techblog.api.post.domain;
 
 import com.techblog.api.post.in.CollectPostIn;
+import com.techblog.api.post.model.CollectResultInfo;
 import com.techblog.api.post.model.PostInfo;
 import com.techblog.common.constant.Company;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +34,17 @@ public class CollectManager implements InitializingBean {
         }
     }
 
-    public void collect(CollectPostIn collectPostIn) {
+    public CollectResultInfo collect(CollectPostIn collectPostIn) {
         log.info("[CollectManager] company : {}", collectPostIn.getCompany());
+        long startTime = System.currentTimeMillis();
+
         Collector collector = collectorMap.get(collectPostIn.getCompany());
         List<PostInfo> postInfoList = collector.toPostInfo(collectPostIn.getCompany());
         log.info("[CollectManager] postInfo`s Class : {}", postInfoList.getClass().getTypeName());
-        collector.savePost(postInfoList);
+        CollectResultInfo collectResultInfo = collector.savePost(postInfoList);
+
+        long executedTime = System.currentTimeMillis() - startTime;
+        collectResultInfo.setExecutedTime(executedTime);
+        return collectResultInfo;
     }
 }

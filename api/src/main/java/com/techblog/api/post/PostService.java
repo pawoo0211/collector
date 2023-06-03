@@ -2,6 +2,7 @@ package com.techblog.api.post;
 
 import com.techblog.api.post.domain.CollectManager;
 import com.techblog.api.post.in.CollectPostIn;
+import com.techblog.api.post.model.CollectResultInfo;
 import com.techblog.api.post.model.SearchVo;
 import com.techblog.api.post.out.CollectPostOut;
 import com.techblog.api.post.out.SearchPostOut;
@@ -18,11 +19,11 @@ public class PostService {
     private final CollectManager collectManager;
 
     public CollectPostOut collectPost(CollectPostIn collectPostIn) {
-        collectManager.collect(collectPostIn);
+        CollectResultInfo collectResultInfo = collectManager.collect(collectPostIn);
 
         return CollectPostOut.builder()
-                .totalCount(100)
-                .executedTime(10000L)
+                .totalCount(collectResultInfo.getSavedPostCount())
+                .executedTime(collectResultInfo.getExecutedTime().toString() + "ms")
                 .build();
     }
 
