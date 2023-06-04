@@ -29,7 +29,11 @@ public enum Company {
             "https://d2.naver.com/api/v1/contents?categoryId=2&page=15&size=20",
             "https://d2.naver.com/api/v1/contents?categoryId=2&page=16&size=20",
             "https://d2.naver.com/api/v1/contents?categoryId=2&page=17&size=20"
-            ));
+            )),
+    NHN("NHN", Arrays.asList(
+            "https://meetup.nhncloud.com/tcblog/v1.0/posts?pageNo=1&rowsPerPage=12",
+            "https://meetup.nhncloud.com/tcblog/v1.0/posts?pageNo=26&rowsPerPage=12"
+    ));
 
     private final String name;
     private final List<String> urlList;

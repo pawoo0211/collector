@@ -40,7 +40,6 @@ public class CollectManager implements InitializingBean {
 
         Collector collector = collectorMap.get(collectPostIn.getCompany());
         List<PostInfo> postInfoList = collector.toPostInfo(collectPostIn.getCompany());
-        log.info("[CollectManager] postInfo`s Class : {}", postInfoList.getClass().getTypeName());
         CollectResultInfo collectResultInfo = collector.savePost(postInfoList);
 
         long executedTime = System.currentTimeMillis() - startTime;

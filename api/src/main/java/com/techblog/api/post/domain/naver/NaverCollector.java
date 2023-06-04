@@ -62,7 +62,7 @@ public class NaverCollector implements Collector {
                 break;
             } else {
                 internalContentList = internalNaverPostVo.getContent();
-                rightInternalContentList = SavePossibilityContent(internalContentList);
+                rightInternalContentList = savePossibilityContent(internalContentList);
 
                 savedPostCount += saveRightContent(rightInternalContentList);
             }
@@ -98,7 +98,7 @@ public class NaverCollector implements Collector {
                 .build();
     }
 
-    private List<InternalContent> SavePossibilityContent(List<InternalContent> internalContentList) {
+    private List<InternalContent> savePossibilityContent(List<InternalContent> internalContentList) {
         List<InternalContent> rightInternalContentList = new ArrayList<>();
         InternalContent standardizedContent = internalContentList.get(0);
         long standardizedPostPublishedAt = standardizedContent.getPostPublishedAt();
