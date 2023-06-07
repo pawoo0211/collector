@@ -2,8 +2,8 @@ package com.techblog.api.post;
 
 import com.techblog.api.post.domain.CollectManager;
 import com.techblog.api.post.in.CollectPostIn;
-import com.techblog.api.post.model.CollectResultInfo;
-import com.techblog.api.post.model.SearchVo;
+import com.techblog.api.post.model.CollectResult;
+import com.techblog.api.post.model.Search;
 import com.techblog.api.post.out.CollectPostOut;
 import com.techblog.api.post.out.SearchPostOut;
 import lombok.RequiredArgsConstructor;
@@ -19,26 +19,26 @@ public class PostService {
     private final CollectManager collectManager;
 
     public CollectPostOut collectPost(CollectPostIn collectPostIn) {
-        CollectResultInfo collectResultInfo = collectManager.collect(collectPostIn);
+        CollectResult collectResult = collectManager.collect(collectPostIn);
 
         return CollectPostOut.builder()
-                .totalCount(collectResultInfo.getSavedPostCount())
-                .executedTime(collectResultInfo.getExecutedTime().toString() + "ms")
+                .totalCount(collectResult.getSavedPostCount())
+                .executedTime(collectResult.getExecutedTime().toString() + "ms")
                 .build();
     }
 
     public SearchPostOut search(String keyword) {
-        List<SearchVo> searchVoList = new ArrayList<>();
-        SearchVo searchVo = SearchVo
+        List<Search> searchList = new ArrayList<>();
+        Search search = Search
                 .builder()
                 .title("네이버 기술 블로그 글")
                 .link("www.test.com")
                 .build();
 
-        searchVoList.add(searchVo);
+        searchList.add(search);
 
         SearchPostOut searchPostOut = new SearchPostOut();
-        searchPostOut.setSearchVoList(searchVoList);
+        searchPostOut.setSearchList(searchList);
 
         return searchPostOut;
     }

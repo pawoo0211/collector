@@ -1,13 +1,13 @@
 package com.techblog.api.post.model.nhn.internal;
 
-import com.techblog.api.post.model.PostInfo;
+import com.techblog.api.post.model.Post;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-public class InternalNhnPost extends PostInfo {
+public class InternalNhnPost extends Post {
 
     private List<InternalNhnContent> content;
 

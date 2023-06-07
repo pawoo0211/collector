@@ -1,15 +1,15 @@
 package com.techblog.api.post.domain.nhn;
 
 import com.techblog.api.post.domain.Collector;
-import com.techblog.api.post.model.CollectResultInfo;
-import com.techblog.api.post.model.PostInfo;
+import com.techblog.api.post.model.CollectResult;
+import com.techblog.api.post.model.Post;
 import com.techblog.api.post.model.nhn.external.ExternalNhnPostPerLang;
 import com.techblog.api.post.model.nhn.external.ExternalNhnPost;
 import com.techblog.api.post.model.nhn.external.ExternalNhnPostVo;
 import com.techblog.api.post.model.nhn.internal.InternalNhnContent;
 import com.techblog.api.post.model.nhn.internal.InternalNhnPost;
 import com.techblog.common.constant.Company;
-import com.techblog.common.webclient.DataCommunication;
+import com.techblog.common.webclient.ApiConnector;
 import com.techblog.dao.document.PostEntity;
 import com.techblog.dao.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,31 +28,31 @@ import java.util.List;
 public class NhnCollector implements Collector {
 
     private final PostRepository postRepository;
-    private final DataCommunication dataCommunication;
+    private final ApiConnector apiConnector;
     private final String FIXED_NHN_URL = "https://meetup.nhncloud.com/posts/";
 
     @Override
-    public List<PostInfo> toPostInfo(Company company) {
+    public List<Post> toPost(Company company) {
         List<String> NhnPostUrlList = company.getUrlList();
-        List<PostInfo> externalNhnPostInfoList = new ArrayList<>();
+        List<Post> externalNhnPostList = new ArrayList<>();
 
         log.info("[NaverCollector] Data communication is started");
         for (String url : NhnPostUrlList) {
-            ExternalNhnPost externalNhnPost = dataCommunication.getHttpCall(url, ExternalNhnPost.class);
-            externalNhnPostInfoList.add(externalNhnPost);
+            ExternalNhnPost externalNhnPost = apiConnector.getHttpCall(url, ExternalNhnPost.class);
+            externalNhnPostList.add(externalNhnPost);
         }
 
-        return externalNhnPostInfoList;
+        return externalNhnPostList;
     }
 
     @Override
-    public CollectResultInfo savePost(List<PostInfo> postInfoList) {
+    public CollectResult savePost(List<Post> postList) {
         log.info("[NhnCollector] savePost method is started");
         List<InternalNhnPost> internalNhnPostList = new ArrayList<>();
         List<InternalNhnContent> rightNhnContentVoList = new ArrayList<>();
         int savedPostCount = 0;
 
-        for (PostInfo externalNhnPost : postInfoList) {
+        for (Post externalNhnPost : postList) {
             InternalNhnPost internalNhnPost = toInternalNhnPostVo(externalNhnPost);
             internalNhnPostList.add(internalNhnPost);
         }
@@ -70,7 +70,7 @@ public class NhnCollector implements Collector {
             }
         }
 
-        return CollectResultInfo.builder()
+        return CollectResult.builder()
                 .savedPostCount(savedPostCount)
                 .executedTime(0L)
                 .build();
@@ -85,7 +85,7 @@ public class NhnCollector implements Collector {
      * TODO
      * - PostVo -> Post로 변경
      */
-    private <T extends PostInfo> InternalNhnPost toInternalNhnPostVo(T externalNhnPost) {
+    private <T extends Post> InternalNhnPost toInternalNhnPostVo(T externalNhnPost) {
         List<ExternalNhnPostVo> content = externalNhnPost.getContent();
         List<InternalNhnContent> internalNhnContentList = new ArrayList<>();
 

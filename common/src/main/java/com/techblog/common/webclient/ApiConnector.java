@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class DataCommunication {
+public class ApiConnector {
 
     private final WebClientConfig webClientConfig;
 

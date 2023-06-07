@@ -1,7 +1,6 @@
 package com.techblog.api.post.model.naver.external;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.techblog.api.post.model.PostInfo;
+import com.techblog.api.post.model.Post;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,7 +9,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class ExternalNaverPost extends PostInfo {
+public class ExternalNaverPost extends Post {
 
     private List<ExternalNaverLink> links;
     private List<ExternalNaverContent> content;

@@ -2,13 +2,13 @@ package com.techblog.api.post.model;
 
 import lombok.Builder;
 
-public class CollectResultInfo {
+public class CollectResult {
 
     private int savedPostCount;
     private Long executedTime;
 
     @Builder
-    public CollectResultInfo(int savedPostCount, long executedTime) {
+    public CollectResult(int savedPostCount, long executedTime) {
         this.savedPostCount = savedPostCount;
         this.executedTime = executedTime;
     }
