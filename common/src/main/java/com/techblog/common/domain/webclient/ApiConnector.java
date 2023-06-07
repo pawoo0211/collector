@@ -1,4 +1,4 @@
-package com.techblog.common.webclient;
+package com.techblog.common.domain.webclient;
 
 import com.techblog.common.config.WebClientConfig;
 import lombok.RequiredArgsConstructor;

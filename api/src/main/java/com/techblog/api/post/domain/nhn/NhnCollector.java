@@ -9,7 +9,8 @@ import com.techblog.api.post.model.nhn.external.ExternalNhnPostVo;
 import com.techblog.api.post.model.nhn.internal.InternalNhnContent;
 import com.techblog.api.post.model.nhn.internal.InternalNhnPost;
 import com.techblog.common.constant.Company;
-import com.techblog.common.webclient.ApiConnector;
+import com.techblog.common.util.datetime.CustomDateTime;
+import com.techblog.common.domain.webclient.ApiConnector;
 import com.techblog.dao.document.PostEntity;
 import com.techblog.dao.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -108,10 +107,10 @@ public class NhnCollector implements Collector {
     private List<InternalNhnContent> savePossibilityContent(List<InternalNhnContent> internalNhnContentList) {
         List<InternalNhnContent> rightInternalContentVoList = new ArrayList<>();
         InternalNhnContent standardInternalNhnContent = internalNhnContentList.get(0);
-        final LocalDateTime STANDARD_PUBLISH_TIME = toLocalDateTime(standardInternalNhnContent.getPublishTime());
+        final LocalDateTime STANDARD_PUBLISH_TIME = CustomDateTime.toLocalDateTime(standardInternalNhnContent.getPublishTime());
 
         for (InternalNhnContent internalNhnContent : internalNhnContentList) {
-            LocalDateTime publishTime = toLocalDateTime(internalNhnContent.getPublishTime());
+            LocalDateTime publishTime = CustomDateTime.toLocalDateTime(internalNhnContent.getPublishTime());
 
             if (publishTime.isBefore(STANDARD_PUBLISH_TIME)) {
                 continue;
@@ -140,17 +139,5 @@ public class NhnCollector implements Collector {
             log.info("[NhnCollector] savePost`s result : {}", foundNaverPost.getTitle());
         }
         return savedPostCount;
-    }
-
-    /**
-     * TODO
-     * - common 모듈로 빼기
-     */
-    private LocalDateTime toLocalDateTime(String dateTimeString) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse(dateTimeString, formatter);
-        LocalDateTime dateTime = offsetDateTime.toLocalDateTime();
-
-        return dateTime;
     }
 }

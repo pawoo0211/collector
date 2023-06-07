@@ -8,7 +8,7 @@ import com.techblog.api.post.model.naver.internal.InternalContent;
 import com.techblog.api.post.model.naver.internal.InternalNaverPost;
 import com.techblog.api.post.model.naver.external.ExternalNaverPost;
 import com.techblog.common.constant.Company;
-import com.techblog.common.webclient.ApiConnector;
+import com.techblog.common.domain.webclient.ApiConnector;
 import com.techblog.dao.document.PostEntity;
 import com.techblog.dao.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
