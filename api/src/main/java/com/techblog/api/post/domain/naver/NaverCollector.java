@@ -3,10 +3,10 @@ package com.techblog.api.post.domain.naver;
 import com.techblog.api.post.domain.Collector;
 import com.techblog.api.post.model.CollectResultInfo;
 import com.techblog.api.post.model.PostInfo;
-import com.techblog.api.post.model.naver.external.Content;
+import com.techblog.api.post.model.naver.external.ExternalNaverContent;
 import com.techblog.api.post.model.naver.internal.InternalContent;
 import com.techblog.api.post.model.naver.internal.InternalNaverPostVo;
-import com.techblog.api.post.model.naver.external.ExternalNaverPostVo;
+import com.techblog.api.post.model.naver.external.ExternalNaverPost;
 import com.techblog.common.constant.Company;
 import com.techblog.common.webclient.DataCommunication;
 import com.techblog.dao.document.PostEntity;
@@ -33,8 +33,8 @@ public class NaverCollector implements Collector {
 
         log.info("[NaverCollector] Data communication is started");
         for (String url : naverPostUrlList) {
-            ExternalNaverPostVo externalNaverPostVo = dataCommunication.getHttpCall(url, ExternalNaverPostVo.class);
-            externalNaverPostInfoList.add(externalNaverPostVo);
+            ExternalNaverPost externalNaverPost = dataCommunication.getHttpCall(url, ExternalNaverPost.class);
+            externalNaverPostInfoList.add(externalNaverPost);
         }
 
         return externalNaverPostInfoList;
@@ -80,14 +80,14 @@ public class NaverCollector implements Collector {
     }
 
     private <T extends PostInfo> InternalNaverPostVo toInternalNaverPostInfo(T externalNaverPostInfo) {
-        List<Content> externalContentList = externalNaverPostInfo.getContent();
+        List<ExternalNaverContent> externalExternalNaverContentList = externalNaverPostInfo.getContent();
         List<InternalContent> internalContentList = new ArrayList<>();
 
-        for (Content externalContent : externalContentList) {
+        for (ExternalNaverContent externalExternalNaverContent : externalExternalNaverContentList) {
             InternalContent internalContent = InternalContent.builder()
-                    .postTitle(externalContent.getPostTitle())
-                    .postPublishedAt(externalContent.getPostPublishedAt())
-                    .url(externalContent.getUrl())
+                    .postTitle(externalExternalNaverContent.getPostTitle())
+                    .postPublishedAt(externalExternalNaverContent.getPostPublishedAt())
+                    .url(externalExternalNaverContent.getUrl())
                     .build();
 
             internalContentList.add(internalContent);

@@ -1,4 +1,4 @@
-package com.techblog.api.post.domain.line;
+package com.techblog.api.post.domain.nhn;
 
 import com.techblog.api.post.domain.Collector;
 import com.techblog.api.post.model.CollectResultInfo;
@@ -6,8 +6,8 @@ import com.techblog.api.post.model.PostInfo;
 import com.techblog.api.post.model.nhn.external.ExternalNhnPostPerLang;
 import com.techblog.api.post.model.nhn.external.ExternalNhnPost;
 import com.techblog.api.post.model.nhn.external.ExternalNhnPostVo;
-import com.techblog.api.post.model.nhn.internal.InternalNhnContentVo;
-import com.techblog.api.post.model.nhn.internal.InternalNhnPostVo;
+import com.techblog.api.post.model.nhn.internal.InternalNhnContent;
+import com.techblog.api.post.model.nhn.internal.InternalNhnPost;
 import com.techblog.common.constant.Company;
 import com.techblog.common.webclient.DataCommunication;
 import com.techblog.dao.document.PostEntity;
@@ -48,24 +48,24 @@ public class NhnCollector implements Collector {
     @Override
     public CollectResultInfo savePost(List<PostInfo> postInfoList) {
         log.info("[NhnCollector] savePost method is started");
-        List<InternalNhnPostVo> internalNhnPostVoList = new ArrayList<>();
-        List<InternalNhnContentVo> rightNhnContentVoList = new ArrayList<>();
+        List<InternalNhnPost> internalNhnPostList = new ArrayList<>();
+        List<InternalNhnContent> rightNhnContentVoList = new ArrayList<>();
         int savedPostCount = 0;
 
         for (PostInfo externalNhnPost : postInfoList) {
-            InternalNhnPostVo internalNhnPostVo = toInternalNhnPostVo(externalNhnPost);
-            internalNhnPostVoList.add(internalNhnPostVo);
+            InternalNhnPost internalNhnPost = toInternalNhnPostVo(externalNhnPost);
+            internalNhnPostList.add(internalNhnPost);
         }
 
-        for (InternalNhnPostVo internalNhnPostVo : internalNhnPostVoList) {
+        for (InternalNhnPost internalNhnPost : internalNhnPostList) {
             if (postRepository.countByCompanyName(Company.NHN.getName()) == 0) {
                 log.info("[NaverCollector] Total nhn post count is 0");
-                for (InternalNhnPostVo internalPostVo : internalNhnPostVoList) {
+                for (InternalNhnPost internalPostVo : internalNhnPostList) {
                     savedPostCount += saveRightContent(internalPostVo.getContent());
                 }
                 break;
             } else {
-                rightNhnContentVoList = savePossibilityContent(internalNhnPostVo.getContent());
+                rightNhnContentVoList = savePossibilityContent(internalNhnPost.getContent());
                 savedPostCount += saveRightContent(rightNhnContentVoList);
             }
         }
@@ -85,15 +85,15 @@ public class NhnCollector implements Collector {
      * TODO
      * - PostVo -> Post로 변경
      */
-    private <T extends PostInfo> InternalNhnPostVo toInternalNhnPostVo(T externalNhnPost) {
+    private <T extends PostInfo> InternalNhnPost toInternalNhnPostVo(T externalNhnPost) {
         List<ExternalNhnPostVo> content = externalNhnPost.getContent();
-        List<InternalNhnContentVo> internalNhnContentVoList = new ArrayList<>();
+        List<InternalNhnContent> internalNhnContentList = new ArrayList<>();
 
         for (ExternalNhnPostVo externalNhnPostVo : content) {
             ExternalNhnPostPerLang externalNhnPostPerLang = externalNhnPostVo.getContent();
             int postId = externalNhnPostPerLang.getPostId();
 
-            InternalNhnContentVo internalNhnContentVo = InternalNhnContentVo.builder()
+            InternalNhnContent internalNhnContent = InternalNhnContent.builder()
                     .postId(postId)
                     .url(FIXED_NHN_URL + postId)
                     .title(externalNhnPostPerLang.getTitle())
@@ -101,11 +101,11 @@ public class NhnCollector implements Collector {
                     .publishTime(externalNhnPostVo.getPublishTime())
                     .build();
 
-            internalNhnContentVoList.add(internalNhnContentVo);
+            internalNhnContentList.add(internalNhnContent);
         }
 
-        return InternalNhnPostVo.builder()
-                .content(internalNhnContentVoList)
+        return InternalNhnPost.builder()
+                .content(internalNhnContentList)
                 .build();
     }
 
@@ -113,17 +113,17 @@ public class NhnCollector implements Collector {
      * TODO
      * - 객체 탐색 줄이기
      */
-    private List<InternalNhnContentVo> savePossibilityContent(List<InternalNhnContentVo> internalNhnContentVoList) {
-        List<InternalNhnContentVo> rightInternalContentVoList = new ArrayList<>();
-        final LocalDateTime STANDARD_PUBLISH_TIME = toLocalDateTime(internalNhnContentVoList.get(0).getPublishTime());
+    private List<InternalNhnContent> savePossibilityContent(List<InternalNhnContent> internalNhnContentList) {
+        List<InternalNhnContent> rightInternalContentVoList = new ArrayList<>();
+        final LocalDateTime STANDARD_PUBLISH_TIME = toLocalDateTime(internalNhnContentList.get(0).getPublishTime());
 
-        for (InternalNhnContentVo internalNhnContentVo : internalNhnContentVoList) {
-            LocalDateTime publishTime = toLocalDateTime(internalNhnContentVo.getPublishTime());
+        for (InternalNhnContent internalNhnContent : internalNhnContentList) {
+            LocalDateTime publishTime = toLocalDateTime(internalNhnContent.getPublishTime());
 
             if (publishTime.isBefore(STANDARD_PUBLISH_TIME)) {
                 continue;
             }
-            rightInternalContentVoList.add(internalNhnContentVo);
+            rightInternalContentVoList.add(internalNhnContent);
         }
 
         rightInternalContentVoList.remove(0);
@@ -131,10 +131,10 @@ public class NhnCollector implements Collector {
         return rightInternalContentVoList;
     }
 
-    private int saveRightContent(List<InternalNhnContentVo> internalNhnContentVo) {
+    private int saveRightContent(List<InternalNhnContent> internalNhnContent) {
         int savedPostCount = 0;
 
-        for (InternalNhnContentVo rightContent : internalNhnContentVo) {
+        for (InternalNhnContent rightContent : internalNhnContent) {
             PostEntity nhnPost = PostEntity.builder()
                     .companyName(Company.NHN.getName())
                     .title(rightContent.getTitle())

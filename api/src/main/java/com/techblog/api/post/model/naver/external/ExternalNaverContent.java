@@ -4,7 +4,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class Content {
+public class ExternalNaverContent {
 
     private String postTitle;
     private String postImage;

@@ -3,7 +3,7 @@ package com.techblog.api.post.model.naver.external;
 import lombok.Getter;
 
 @Getter
-public class Link {
+public class ExternalNaverLink {
 
     private String rel;
     private String href;

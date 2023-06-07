@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class ExternalNhnPost extends PostInfo {
 
-    private ExternalNhnHeaderVo header;
+    private ExternalNhnHeader header;
     private int totalCount;
 
     @JsonProperty(value = "posts")
