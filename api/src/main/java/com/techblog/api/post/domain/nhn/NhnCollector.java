@@ -105,13 +105,10 @@ public class NhnCollector implements Collector {
                 .build();
     }
 
-    /**
-     * TODO
-     * - 객체 탐색 줄이기
-     */
     private List<InternalNhnContent> savePossibilityContent(List<InternalNhnContent> internalNhnContentList) {
         List<InternalNhnContent> rightInternalContentVoList = new ArrayList<>();
-        final LocalDateTime STANDARD_PUBLISH_TIME = toLocalDateTime(internalNhnContentList.get(0).getPublishTime());
+        InternalNhnContent standardInternalNhnContent = internalNhnContentList.get(0);
+        final LocalDateTime STANDARD_PUBLISH_TIME = toLocalDateTime(standardInternalNhnContent.getPublishTime());
 
         for (InternalNhnContent internalNhnContent : internalNhnContentList) {
             LocalDateTime publishTime = toLocalDateTime(internalNhnContent.getPublishTime());
