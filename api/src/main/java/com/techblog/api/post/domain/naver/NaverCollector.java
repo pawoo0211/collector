@@ -84,8 +84,11 @@ public class NaverCollector implements Collector {
         List<InternalContent> internalContentList = new ArrayList<>();
 
         for (ExternalNaverContent externalExternalNaverContent : externalExternalNaverContentList) {
+            String contentPreview = externalExternalNaverContent.getPostHtml().substring(29);
+
             InternalContent internalContent = InternalContent.builder()
                     .postTitle(externalExternalNaverContent.getPostTitle())
+                    .contentPreview(contentPreview)
                     .postPublishedAt(externalExternalNaverContent.getPostPublishedAt())
                     .url(externalExternalNaverContent.getUrl())
                     .build();
@@ -119,9 +122,11 @@ public class NaverCollector implements Collector {
         int savedPostCount = 0;
 
         for (InternalContent rightContent : rightInternalContentList) {
+
             PostEntity naverPost = PostEntity.builder()
                     .companyName(Company.NAVER.getName())
                     .title(rightContent.getPostTitle())
+                    .contentPreview(rightContent.getContentPreview())
                     .url(rightContent.getUrl())
                     .build();
 

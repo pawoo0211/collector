@@ -14,12 +14,14 @@ public class PostEntity {
     private String postId;
     private String companyName;
     private String title;
+    private String contentPreview;
     private String url;
 
     @Builder
-    public PostEntity(String companyName, String title, String url) {
+    public PostEntity(String companyName, String title, String contentPreview, String url) {
         this.companyName = companyName;
         this.title = title;
+        this.contentPreview = contentPreview;
         this.url = url;
     }
 }

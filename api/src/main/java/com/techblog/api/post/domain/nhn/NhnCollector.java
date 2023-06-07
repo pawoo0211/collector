@@ -130,6 +130,7 @@ public class NhnCollector implements Collector {
             PostEntity nhnPost = PostEntity.builder()
                     .companyName(Company.NHN.getName())
                     .title(rightContent.getTitle())
+                    .contentPreview(rightContent.getContentPreview())
                     .url(rightContent.getUrl())
                     .build();
 
