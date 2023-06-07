@@ -49,7 +49,7 @@ public class NaverCollector implements Collector {
         int savedPostCount = 0;
 
         for (Post externalNaverPost : externalNaverPostList) {
-            InternalNaverPost internalNaverPost = toInternalNaverPostInfo(externalNaverPost);
+            InternalNaverPost internalNaverPost = toInternalNaverPost(externalNaverPost);
             internalNaverPostList.add(internalNaverPost);
         }
 
@@ -79,8 +79,8 @@ public class NaverCollector implements Collector {
         return Company.NAVER;
     }
 
-    private <T extends Post> InternalNaverPost toInternalNaverPostInfo(T externalNaverPostInfo) {
-        List<ExternalNaverContent> externalExternalNaverContentList = externalNaverPostInfo.getContent();
+    private <T extends Post> InternalNaverPost toInternalNaverPost(T externalNaverPost) {
+        List<ExternalNaverContent> externalExternalNaverContentList = externalNaverPost.getContent();
         List<InternalContent> internalContentList = new ArrayList<>();
 
         for (ExternalNaverContent externalExternalNaverContent : externalExternalNaverContentList) {
