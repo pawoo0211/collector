@@ -53,15 +53,15 @@ public class NhnCollector implements Collector {
         int savedPostCount = 0;
 
         for (Post externalNhnPost : postList) {
-            InternalNhnPost internalNhnPost = toInternalNhnPostVo(externalNhnPost);
+            InternalNhnPost internalNhnPost = toInternalNhnPost(externalNhnPost);
             internalNhnPostList.add(internalNhnPost);
         }
 
         for (InternalNhnPost internalNhnPost : internalNhnPostList) {
             if (postRepository.countByCompanyName(Company.NHN.getName()) == 0) {
                 log.info("[NaverCollector] Total nhn post count is 0");
-                for (InternalNhnPost internalPostVo : internalNhnPostList) {
-                    savedPostCount += saveRightContent(internalPostVo.getContent());
+                for (InternalNhnPost internalPostInfo : internalNhnPostList) {
+                    savedPostCount += saveRightContent(internalPostInfo.getContent());
                 }
                 break;
             } else {
@@ -81,11 +81,7 @@ public class NhnCollector implements Collector {
         return Company.NHN;
     }
 
-    /**
-     * TODO
-     * - PostVo -> Post로 변경
-     */
-    private <T extends Post> InternalNhnPost toInternalNhnPostVo(T externalNhnPost) {
+    private <T extends Post> InternalNhnPost toInternalNhnPost(T externalNhnPost) {
         List<ExternalNhnPostVo> content = externalNhnPost.getContent();
         List<InternalNhnContent> internalNhnContentList = new ArrayList<>();
 
