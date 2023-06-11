@@ -2,7 +2,9 @@ package com.techblog.api.controller;
 
 import com.techblog.api.post.PostService;
 import com.techblog.api.post.in.CollectPostIn;
+import com.techblog.api.post.in.SaveUrlIn;
 import com.techblog.api.post.out.CollectPostOut;
+import com.techblog.api.post.out.SaveUrlOut;
 import com.techblog.api.post.out.SearchPostOut;
 import com.techblog.common.CommonResponse;
 import com.techblog.common.constant.ResultCode;
@@ -30,4 +32,13 @@ public class PostController {
 
         return CommonResponse.ok(10, "성공", searchPostOut);
     }
+
+    @PostMapping("/url/save")
+    public CommonResponse saveUrl(@RequestBody SaveUrlIn saveUrlIn) {
+        SaveUrlOut saveUrlOut = postService.saveUrl(saveUrlIn);
+
+        return CommonResponse.ok(ResultCode.SAVE_URL_SUCCESS.getResultCode(),
+                ResultCode.SAVE_URL_SUCCESS.getResultMessage(), saveUrlOut);
+    }
+
 }

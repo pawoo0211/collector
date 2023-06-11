@@ -1,4 +1,4 @@
-package com.techblog.dao.document;
+package com.techblog.dao.mongodb;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "post")
 @Getter
-public class PostEntity {
+public class PostMongoEntity {
 
     @Id
     private String postId;
@@ -18,7 +18,7 @@ public class PostEntity {
     private String url;
 
     @Builder
-    public PostEntity(String companyName, String title, String contentPreview, String url) {
+    public PostMongoEntity(String companyName, String title, String contentPreview, String url) {
         this.companyName = companyName;
         this.title = title;
         this.contentPreview = contentPreview;

@@ -9,8 +9,8 @@ import com.techblog.api.post.model.naver.internal.InternalNaverPost;
 import com.techblog.api.post.model.naver.external.ExternalNaverPost;
 import com.techblog.common.constant.Company;
 import com.techblog.common.domain.webclient.ApiConnector;
-import com.techblog.dao.document.PostEntity;
-import com.techblog.dao.repository.PostRepository;
+import com.techblog.dao.mongodb.PostMongoEntity;
+import com.techblog.dao.mongodb.PostMongoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 public class NaverCollector implements Collector {
 
-    private final PostRepository postRepository;
+    private final PostMongoRepository postMongoRepository;
     private final ApiConnector apiConnector;
 
     @Override
@@ -54,7 +54,7 @@ public class NaverCollector implements Collector {
         }
 
         for (InternalNaverPost internalNaverPost : internalNaverPostList) {
-            if (postRepository.countByCompanyName(Company.NAVER.getName()) == 0) {
+            if (postMongoRepository.countByCompanyName(Company.NAVER.getName()) == 0) {
                 log.info("[NaverCollector] Total naver post count is 0");
                 for (InternalNaverPost naverPostInfo : internalNaverPostList) {
                     savedPostCount += saveRightContent(naverPostInfo.getContent());
@@ -123,16 +123,16 @@ public class NaverCollector implements Collector {
 
         for (InternalContent rightContent : rightInternalContentList) {
 
-            PostEntity naverPost = PostEntity.builder()
+            PostMongoEntity naverPost = PostMongoEntity.builder()
                     .companyName(Company.NAVER.getName())
                     .title(rightContent.getPostTitle())
                     .contentPreview(rightContent.getContentPreview())
                     .url(rightContent.getUrl())
                     .build();
 
-            postRepository.save(naverPost);
+            postMongoRepository.save(naverPost);
             savedPostCount += 1;
-            PostEntity foundNaverPost = postRepository.findByPostId(naverPost.getPostId());
+            PostMongoEntity foundNaverPost = postMongoRepository.findByPostId(naverPost.getPostId());
             log.info("[NaverCollector] savePost`s result : {}", foundNaverPost.getTitle());
         }
 

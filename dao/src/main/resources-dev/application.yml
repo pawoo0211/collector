@@ -7,3 +7,15 @@ spring:
       password: park4526
       database: collector
       authentication-database: admin
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/collector?useUnicode=true&serverTimezone=Asia/Seoul
+    username: root
+    password: park4526!!
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    output:
+      ansi:
+        enabled: always

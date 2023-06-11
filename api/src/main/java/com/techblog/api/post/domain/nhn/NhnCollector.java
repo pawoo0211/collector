@@ -11,8 +11,8 @@ import com.techblog.api.post.model.nhn.internal.InternalNhnPost;
 import com.techblog.common.constant.Company;
 import com.techblog.common.util.datetime.CustomDateTime;
 import com.techblog.common.domain.webclient.ApiConnector;
-import com.techblog.dao.document.PostEntity;
-import com.techblog.dao.repository.PostRepository;
+import com.techblog.dao.mongodb.PostMongoEntity;
+import com.techblog.dao.mongodb.PostMongoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ import java.util.List;
 @Slf4j
 public class NhnCollector implements Collector {
 
-    private final PostRepository postRepository;
+    private final PostMongoRepository postMongoRepository;
     private final ApiConnector apiConnector;
     private final String FIXED_NHN_URL = "https://meetup.nhncloud.com/posts/";
 
@@ -57,7 +57,7 @@ public class NhnCollector implements Collector {
         }
 
         for (InternalNhnPost internalNhnPost : internalNhnPostList) {
-            if (postRepository.countByCompanyName(Company.NHN.getName()) == 0) {
+            if (postMongoRepository.countByCompanyName(Company.NHN.getName()) == 0) {
                 log.info("[NaverCollector] Total nhn post count is 0");
                 for (InternalNhnPost internalPostInfo : internalNhnPostList) {
                     savedPostCount += saveRightContent(internalPostInfo.getContent());
@@ -127,16 +127,16 @@ public class NhnCollector implements Collector {
         int savedPostCount = 0;
 
         for (InternalNhnContent rightContent : internalNhnContent) {
-            PostEntity nhnPost = PostEntity.builder()
+            PostMongoEntity nhnPost = PostMongoEntity.builder()
                     .companyName(Company.NHN.getName())
                     .title(rightContent.getTitle())
                     .contentPreview(rightContent.getContentPreview())
                     .url(rightContent.getUrl())
                     .build();
 
-            postRepository.save(nhnPost);
+            postMongoRepository.save(nhnPost);
             savedPostCount += 1;
-            PostEntity foundNaverPost = postRepository.findByPostId(nhnPost.getPostId());
+            PostMongoEntity foundNaverPost = postMongoRepository.findByPostId(nhnPost.getPostId());
             log.info("[NhnCollector] savePost`s result : {}", foundNaverPost.getTitle());
         }
         return savedPostCount;

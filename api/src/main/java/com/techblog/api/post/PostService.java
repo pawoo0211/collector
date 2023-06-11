@@ -2,12 +2,18 @@ package com.techblog.api.post;
 
 import com.techblog.api.post.domain.CollectManager;
 import com.techblog.api.post.in.CollectPostIn;
+import com.techblog.api.post.in.SaveUrlIn;
 import com.techblog.api.post.model.CollectResult;
+import com.techblog.api.post.model.CompanyUrl;
 import com.techblog.api.post.model.Search;
 import com.techblog.api.post.out.CollectPostOut;
+import com.techblog.api.post.out.SaveUrlOut;
 import com.techblog.api.post.out.SearchPostOut;
+import com.techblog.dao.jpa.CompanyUrlJpaEntity;
+import com.techblog.dao.jpa.CompanyUrlJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +23,7 @@ import java.util.List;
 public class PostService {
 
     private final CollectManager collectManager;
+    private final CompanyUrlJpaRepository companyUrlJpaRepository;
 
     public CollectPostOut collectPost(CollectPostIn collectPostIn) {
         CollectResult collectResult = collectManager.collect(collectPostIn);
@@ -41,5 +48,29 @@ public class PostService {
         searchPostOut.setSearchList(searchList);
 
         return searchPostOut;
+    }
+
+    @Transactional
+    public SaveUrlOut saveUrl(SaveUrlIn saveUrlIn) {
+        List<CompanyUrl> companyUrlList = saveUrlIn.getUrlList();
+        int count = 0;
+
+        for (CompanyUrl companyUrl : companyUrlList) {
+            String companyName = companyUrl.getCompanyName();
+            List<String> urlList = companyUrl.getUrlList();
+
+            for (String url : urlList) {
+                CompanyUrlJpaEntity companyUrlEntity = CompanyUrlJpaEntity.builder()
+                        .url(url)
+                        .companyName(companyName)
+                        .build();
+                companyUrlJpaRepository.save(companyUrlEntity);
+
+                count += 1;
+            }
+        }
+
+        SaveUrlOut saveUrlOut = new SaveUrlOut(count);
+        return saveUrlOut;
     }
 }
