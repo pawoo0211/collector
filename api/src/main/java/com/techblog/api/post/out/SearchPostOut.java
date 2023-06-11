@@ -1,6 +1,6 @@
 package com.techblog.api.post.out;
 
-import com.techblog.api.post.model.SearchVo;
+import com.techblog.api.post.model.Search;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +10,6 @@ import java.util.List;
 @Setter
 public class SearchPostOut {
 
-    private List<SearchVo> searchVoList;
+    private List<Search> searchList;
 
 }
