@@ -57,13 +57,15 @@ public class PostService {
 
         for (CompanyUrl companyUrl : companyUrlList) {
             String companyName = companyUrl.getCompanyName();
-            List<String> urlList = companyUrl.getUrlList();
+            List<String> urlListIn = companyUrl.getUrlList();
+            List<String> validatedUrlList = extractValidatedUrl(urlListIn);
 
-            for (String url : urlList) {
+            for (String url : validatedUrlList) {
                 CompanyUrlJpaEntity companyUrlEntity = CompanyUrlJpaEntity.builder()
                         .url(url)
                         .companyName(companyName)
                         .build();
+
                 companyUrlJpaRepository.save(companyUrlEntity);
 
                 count += 1;
@@ -72,5 +74,16 @@ public class PostService {
 
         SaveUrlOut saveUrlOut = new SaveUrlOut(count);
         return saveUrlOut;
+    }
+
+    private List<String> extractValidatedUrl(List<String> urlInList) {
+        List<String> validatedUrlList = new ArrayList<>();
+
+        for (String url : urlInList) {
+            if (companyUrlJpaRepository.existsByUrl(url)) continue;
+            validatedUrlList.add(url);
+        }
+
+        return validatedUrlList;
     }
 }
