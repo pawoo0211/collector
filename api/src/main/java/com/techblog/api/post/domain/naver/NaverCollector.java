@@ -9,6 +9,8 @@ import com.techblog.api.post.model.naver.internal.InternalNaverPost;
 import com.techblog.api.post.model.naver.external.ExternalNaverPost;
 import com.techblog.common.constant.Company;
 import com.techblog.common.domain.webclient.ApiConnector;
+import com.techblog.dao.jpa.CompanyUrlJpaEntity;
+import com.techblog.dao.jpa.CompanyUrlJpaRepository;
 import com.techblog.dao.mongodb.PostMongoEntity;
 import com.techblog.dao.mongodb.PostMongoRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -25,10 +28,17 @@ public class NaverCollector implements Collector {
 
     private final PostMongoRepository postMongoRepository;
     private final ApiConnector apiConnector;
+    private final CompanyUrlJpaRepository companyUrlJpaRepository;
 
     @Override
     public List<Post> toPost(Company company) {
-        List<String> naverPostUrlList= company.getUrlList();
+        List<CompanyUrlJpaEntity> naverUrlJpaEntityList = companyUrlJpaRepository
+                .findAllByCompanyName(company.getName());
+
+        List<String> naverPostUrlList = naverUrlJpaEntityList.stream()
+                .map(CompanyUrlJpaEntity::getUrl)
+                .collect(Collectors.toList());
+
         List<Post> externalNaverPostList = new ArrayList<>();
 
         log.info("[NaverCollector] Data communication is started");
@@ -36,6 +46,7 @@ public class NaverCollector implements Collector {
             ExternalNaverPost externalNaverPost = apiConnector.getHttpCall(url, ExternalNaverPost.class);
             externalNaverPostList.add(externalNaverPost);
         }
+        log.info("[NaverCollector] Data communication is end");
 
         return externalNaverPostList;
     }
@@ -67,6 +78,7 @@ public class NaverCollector implements Collector {
                 savedPostCount += saveRightContent(rightInternalContentList);
             }
         }
+        log.info("[NaverCollector] savePost method is end");
 
         return CollectResult.builder()
                 .savedPostCount(savedPostCount)
