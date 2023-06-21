@@ -22,7 +22,7 @@ public class PostController {
     public CommonResponse collectPost(@RequestBody CollectPostIn collectPostIn) {
         CollectPostOut collectPostOut = postService.collectPost(collectPostIn);
 
-        return CommonResponse.ok(ResultCode.COLLECT_SUCCESS.getResultCode(), ResultCode.COLLECT_SUCCESS.getResultMessage(),
+        return CommonResponse.ok(ResultCode.COLLECT_SUCCESS.getMessage(), ResultCode.COLLECT_SUCCESS.getDescription(),
                 collectPostOut);
     }
 
@@ -30,15 +30,14 @@ public class PostController {
     public CommonResponse searchPost(@RequestParam("keyword") String keyword) {
         SearchPostOut searchPostOut = postService.search(keyword);
 
-        return CommonResponse.ok(10, "성공", searchPostOut);
+        return CommonResponse.ok("TEMP", "성공", searchPostOut);
     }
 
     @PostMapping("/url/save")
     public CommonResponse saveUrl(@RequestBody SaveUrlIn saveUrlIn) {
         SaveUrlOut saveUrlOut = postService.saveUrl(saveUrlIn);
 
-        return CommonResponse.ok(ResultCode.SAVE_URL_SUCCESS.getResultCode(),
-                ResultCode.SAVE_URL_SUCCESS.getResultMessage(), saveUrlOut);
+        return CommonResponse.ok(ResultCode.SAVE_URL_SUCCESS.getMessage(),
+                ResultCode.SAVE_URL_SUCCESS.getDescription(), saveUrlOut);
     }
-
 }

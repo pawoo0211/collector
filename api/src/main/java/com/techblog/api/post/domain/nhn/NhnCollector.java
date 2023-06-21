@@ -36,8 +36,6 @@ public class NhnCollector implements Collector {
 
     @Override
     public List<Post> toPost(Company company) {
-//        List<String> NhnPostUrlList = company.getUrlList();
-
         List<CompanyUrlJpaEntity> nhnUrlJpaEntityList = companyUrlJpaRepository
                 .findAllByCompanyName(company.getName());
 
