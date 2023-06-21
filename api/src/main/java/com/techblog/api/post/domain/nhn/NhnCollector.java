@@ -11,6 +11,8 @@ import com.techblog.api.post.model.nhn.internal.InternalNhnPost;
 import com.techblog.common.constant.Company;
 import com.techblog.common.util.datetime.CustomDateTime;
 import com.techblog.common.domain.webclient.ApiConnector;
+import com.techblog.dao.jpa.CompanyUrlJpaEntity;
+import com.techblog.dao.jpa.CompanyUrlJpaRepository;
 import com.techblog.dao.mongodb.PostMongoEntity;
 import com.techblog.dao.mongodb.PostMongoRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,26 +22,37 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class NhnCollector implements Collector {
 
-    private final PostMongoRepository postMongoRepository;
+    private final CompanyUrlJpaRepository companyUrlJpaRepository;
     private final ApiConnector apiConnector;
+    private final PostMongoRepository postMongoRepository;
     private final String FIXED_NHN_URL = "https://meetup.nhncloud.com/posts/";
 
     @Override
     public List<Post> toPost(Company company) {
-        List<String> NhnPostUrlList = company.getUrlList();
+//        List<String> NhnPostUrlList = company.getUrlList();
+
+        List<CompanyUrlJpaEntity> nhnUrlJpaEntityList = companyUrlJpaRepository
+                .findAllByCompanyName(company.getName());
+
+        List<String> nhnPostUrlList = nhnUrlJpaEntityList.stream()
+                .map(CompanyUrlJpaEntity::getUrl)
+                .collect(Collectors.toList());
+
         List<Post> externalNhnPostList = new ArrayList<>();
 
         log.info("[NaverCollector] Data communication is started");
-        for (String url : NhnPostUrlList) {
+        for (String url : nhnPostUrlList) {
             ExternalNhnPost externalNhnPost = apiConnector.getHttpCall(url, ExternalNhnPost.class);
             externalNhnPostList.add(externalNhnPost);
         }
+        log.info("[NaverCollector] Data communication is end");
 
         return externalNhnPostList;
     }
@@ -68,6 +81,7 @@ public class NhnCollector implements Collector {
                 savedPostCount += saveRightContent(rightNhnContentVoList);
             }
         }
+        log.info("[NhnCollector] savePost method is end");
 
         return CollectResult.builder()
                 .savedPostCount(savedPostCount)
