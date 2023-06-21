@@ -34,16 +34,31 @@ public class CollectManager implements InitializingBean {
         }
     }
 
+    /**
+     * 멀티 쓰레딩 처리 전 저장 소요 시간 : 15753ms
+     * 멀티 쓰레딩 처리 전 저장 소요 시간 : ms
+     */
     public CollectResult collect(CollectPostIn collectPostIn) {
-        log.info("[CollectManager] company : {}", collectPostIn.getCompany());
+        List<Company> companyList = collectPostIn.getCompanyList();
+        CollectResult finalCollectResult = CollectResult.builder()
+                .savedPostCount(0)
+                .executedTime(0)
+                .build();
+
         long startTime = System.currentTimeMillis();
 
-        Collector collector = collectorMap.get(collectPostIn.getCompany());
-        List<Post> postList = collector.toPost(collectPostIn.getCompany());
-        CollectResult collectResult = collector.savePost(postList);
+        for (Company company : companyList) {
+            Collector collector = collectorMap.get(company);
+            List<Post> postList = collector.toPost(company);
+            CollectResult collectResult = collector.savePost(postList);
+
+            int savedPostCount = finalCollectResult.getSavedPostCount() + collectResult.getSavedPostCount();
+            finalCollectResult.setExecutedTime(savedPostCount);
+        }
 
         long executedTime = System.currentTimeMillis() - startTime;
-        collectResult.setExecutedTime(executedTime);
-        return collectResult;
+        finalCollectResult.setExecutedTime(executedTime);
+
+        return finalCollectResult;
     }
 }
