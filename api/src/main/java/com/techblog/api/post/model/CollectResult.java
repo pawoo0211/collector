@@ -13,6 +13,10 @@ public class CollectResult {
         this.executedTime = executedTime;
     }
 
+    public void setSavedPostCount(int savedPostCount) {
+        this.savedPostCount = savedPostCount;
+    }
+
     public void setExecutedTime(long executedTime) {
         this.executedTime = executedTime;
     }

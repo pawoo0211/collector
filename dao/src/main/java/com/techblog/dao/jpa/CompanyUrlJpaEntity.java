@@ -3,10 +3,12 @@ package com.techblog.dao.jpa;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "company_urls")
 @Getter
+@NoArgsConstructor
 public class CompanyUrlJpaEntity {
 
     @Id

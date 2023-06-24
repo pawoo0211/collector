@@ -6,12 +6,13 @@ import com.techblog.common.constant.Company;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public interface Collector {
 
     public List<Post> toPost(Company company);
-    public CollectResult savePost(List<Post> postList);
+    public CompletableFuture<CollectResult> savePost(List<Post> postList);
     public Company getCompany();
 
 }

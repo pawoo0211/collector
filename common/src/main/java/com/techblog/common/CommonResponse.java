@@ -6,18 +6,18 @@ import lombok.Getter;
 public class CommonResponse<T> {
 
     private final Boolean isSuccess;
-    private Integer resultCode;
-    private String resultMessage;
+    private String message;
+    private String description;
     private final T out;
 
-    private CommonResponse(Boolean isSuccess, Integer resultCode, String resultMessage, T out) {
+    private CommonResponse(Boolean isSuccess, String message, String description, T out) {
         this.isSuccess = isSuccess;
-        this.resultCode = resultCode;
-        this.resultMessage = resultMessage;
+        this.message = message;
+        this.description = description;
         this.out = out;
     }
 
-    public static <T> CommonResponse ok(Integer resultCode, String resultMessage, T out) {
-        return new CommonResponse(true, resultCode, resultMessage, out);
+    public static <T> CommonResponse ok(String message, String description, T out) {
+        return new CommonResponse(true, message, description, out);
     }
 }
