@@ -1,7 +1,7 @@
 package com.techblog.api.post.model.nhn.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.techblog.api.post.model.PostInfo;
+import com.techblog.api.post.model.Post;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,9 +9,9 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class ExternalNhnPost extends PostInfo {
+public class ExternalNhnPost extends Post {
 
-    private ExternalNhnHeaderVo header;
+    private ExternalNhnHeader header;
     private int totalCount;
 
     @JsonProperty(value = "posts")

@@ -7,9 +7,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ResultCode {
 
-    COLLECT_SUCCESS(00, "글 수집 성공");
+    COLLECT_SUCCESS("COLLECT_SUCCESS", "글 수집 성공"),
+    SAVE_URL_SUCCESS("SAVE_URL_SUCCESS", "URL 저장 성공");
 
-    private final int ResultCode;
-    private final String resultMessage;
+    private final String message;
+    private final String description;
 
 }

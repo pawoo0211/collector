@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class InternalNhnContentVo {
+public class InternalNhnContent {
 
     private int postId;
     private String url;
@@ -13,7 +13,7 @@ public class InternalNhnContentVo {
     private String publishTime;
 
     @Builder
-    public InternalNhnContentVo(int postId, String url, String title, String contentPreview, String publishTime) {
+    public InternalNhnContent(int postId, String url, String title, String contentPreview, String publishTime) {
         this.postId = postId;
         this.url = url;
         this.title = title;

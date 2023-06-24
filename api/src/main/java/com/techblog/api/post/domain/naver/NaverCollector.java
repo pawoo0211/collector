@@ -1,77 +1,94 @@
 package com.techblog.api.post.domain.naver;
 
 import com.techblog.api.post.domain.Collector;
-import com.techblog.api.post.model.CollectResultInfo;
-import com.techblog.api.post.model.PostInfo;
-import com.techblog.api.post.model.naver.external.Content;
+import com.techblog.api.post.model.CollectResult;
+import com.techblog.api.post.model.Post;
+import com.techblog.api.post.model.naver.external.ExternalNaverContent;
 import com.techblog.api.post.model.naver.internal.InternalContent;
-import com.techblog.api.post.model.naver.internal.InternalNaverPostVo;
-import com.techblog.api.post.model.naver.external.ExternalNaverPostVo;
+import com.techblog.api.post.model.naver.internal.InternalNaverPost;
+import com.techblog.api.post.model.naver.external.ExternalNaverPost;
 import com.techblog.common.constant.Company;
-import com.techblog.common.webclient.DataCommunication;
-import com.techblog.dao.document.PostEntity;
-import com.techblog.dao.repository.PostRepository;
+import com.techblog.common.domain.webclient.ApiConnector;
+import com.techblog.dao.jpa.CompanyUrlJpaEntity;
+import com.techblog.dao.jpa.CompanyUrlJpaRepository;
+import com.techblog.dao.mongodb.PostMongoEntity;
+import com.techblog.dao.mongodb.PostMongoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class NaverCollector implements Collector {
 
-    private final PostRepository postRepository;
-    private final DataCommunication dataCommunication;
+    private final PostMongoRepository postMongoRepository;
+    private final ApiConnector apiConnector;
+    private final CompanyUrlJpaRepository companyUrlJpaRepository;
 
     @Override
-    public List<PostInfo> toPostInfo(Company company) {
-        List<String> naverPostUrlList= company.getUrlList();
-        List<PostInfo> externalNaverPostInfoList = new ArrayList<>();
+    public List<Post> toPost(Company company) {
+        List<CompanyUrlJpaEntity> naverUrlJpaEntityList = companyUrlJpaRepository
+                .findAllByCompanyName(company.getName());
+
+        List<String> naverPostUrlList = naverUrlJpaEntityList.stream()
+                .map(CompanyUrlJpaEntity::getUrl)
+                .collect(Collectors.toList());
+
+        List<Post> externalNaverPostList = new ArrayList<>();
 
         log.info("[NaverCollector] Data communication is started");
         for (String url : naverPostUrlList) {
-            ExternalNaverPostVo externalNaverPostVo = dataCommunication.getHttpCall(url, ExternalNaverPostVo.class);
-            externalNaverPostInfoList.add(externalNaverPostVo);
+            ExternalNaverPost externalNaverPost = apiConnector.getHttpCall(url, ExternalNaverPost.class);
+            externalNaverPostList.add(externalNaverPost);
         }
+        log.info("[NaverCollector] Data communication is end");
 
-        return externalNaverPostInfoList;
+        return externalNaverPostList;
     }
 
     @Override
-    public CollectResultInfo savePost(List<PostInfo> externalNaverPostInfoList) {
+    @Async("customThreadPoolExecutor")
+    public CompletableFuture<CollectResult> savePost(List<Post> externalNaverPostList) {
         log.info("[NaverCollector] savePost method is started");
-        List<InternalNaverPostVo> internalNaverPostVoList = new ArrayList<>();
+        List<InternalNaverPost> internalNaverPostList = new ArrayList<>();
         List<InternalContent> internalContentList;
         List<InternalContent> rightInternalContentList;
         int savedPostCount = 0;
 
-        for (PostInfo externalNaverPostInfo : externalNaverPostInfoList) {
-            InternalNaverPostVo internalNaverPostVo = toInternalNaverPostInfo(externalNaverPostInfo);
-            internalNaverPostVoList.add(internalNaverPostVo);
+        for (Post externalNaverPost : externalNaverPostList) {
+            InternalNaverPost internalNaverPost = toInternalNaverPost(externalNaverPost);
+            internalNaverPostList.add(internalNaverPost);
         }
 
-        for (InternalNaverPostVo internalNaverPostVo : internalNaverPostVoList) {
-            if (postRepository.countByCompanyName(Company.NAVER.getName()) == 0) {
+        for (InternalNaverPost internalNaverPost : internalNaverPostList) {
+            if (postMongoRepository.countByCompanyName(Company.NAVER.getName()) == 0) {
                 log.info("[NaverCollector] Total naver post count is 0");
-                for (InternalNaverPostVo naverPostInfo : internalNaverPostVoList) {
+                for (InternalNaverPost naverPostInfo : internalNaverPostList) {
                     savedPostCount += saveRightContent(naverPostInfo.getContent());
                 }
                 break;
             } else {
-                internalContentList = internalNaverPostVo.getContent();
+                internalContentList = internalNaverPost.getContent();
                 rightInternalContentList = savePossibilityContent(internalContentList);
 
                 savedPostCount += saveRightContent(rightInternalContentList);
             }
         }
+        log.info("[NaverCollector] savePost method is end");
 
-        return CollectResultInfo.builder()
+        CollectResult collectResult = CollectResult.builder()
                 .savedPostCount(savedPostCount)
                 .executedTime(0L)
                 .build();
+
+        return CompletableFuture.completedFuture(collectResult);
     }
 
     @Override
@@ -79,21 +96,24 @@ public class NaverCollector implements Collector {
         return Company.NAVER;
     }
 
-    private <T extends PostInfo> InternalNaverPostVo toInternalNaverPostInfo(T externalNaverPostInfo) {
-        List<Content> externalContentList = externalNaverPostInfo.getContent();
+    private <T extends Post> InternalNaverPost toInternalNaverPost(T externalNaverPost) {
+        List<ExternalNaverContent> externalExternalNaverContentList = externalNaverPost.getContent();
         List<InternalContent> internalContentList = new ArrayList<>();
 
-        for (Content externalContent : externalContentList) {
+        for (ExternalNaverContent externalExternalNaverContent : externalExternalNaverContentList) {
+            String contentPreview = externalExternalNaverContent.getPostHtml().substring(29);
+
             InternalContent internalContent = InternalContent.builder()
-                    .postTitle(externalContent.getPostTitle())
-                    .postPublishedAt(externalContent.getPostPublishedAt())
-                    .url(externalContent.getUrl())
+                    .postTitle(externalExternalNaverContent.getPostTitle())
+                    .contentPreview(contentPreview)
+                    .postPublishedAt(externalExternalNaverContent.getPostPublishedAt())
+                    .url(externalExternalNaverContent.getUrl())
                     .build();
 
             internalContentList.add(internalContent);
         }
 
-        return InternalNaverPostVo.builder()
+        return InternalNaverPost.builder()
                 .content(internalContentList)
                 .build();
     }
@@ -119,15 +139,17 @@ public class NaverCollector implements Collector {
         int savedPostCount = 0;
 
         for (InternalContent rightContent : rightInternalContentList) {
-            PostEntity naverPost = PostEntity.builder()
+
+            PostMongoEntity naverPost = PostMongoEntity.builder()
                     .companyName(Company.NAVER.getName())
                     .title(rightContent.getPostTitle())
+                    .contentPreview(rightContent.getContentPreview())
                     .url(rightContent.getUrl())
                     .build();
 
-            postRepository.save(naverPost);
+            postMongoRepository.save(naverPost);
             savedPostCount += 1;
-            PostEntity foundNaverPost = postRepository.findByPostId(naverPost.getPostId());
+            PostMongoEntity foundNaverPost = postMongoRepository.findByPostId(naverPost.getPostId());
             log.info("[NaverCollector] savePost`s result : {}", foundNaverPost.getTitle());
         }
 

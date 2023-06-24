@@ -4,13 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class SearchVo {
+public class Search {
 
     private String title;
     private String link;
 
     @Builder
-    public SearchVo(String title, String link) {
+    public Search(String title, String link) {
         this.title = title;
         this.link = link;
     }
