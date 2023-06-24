@@ -11,6 +11,8 @@ import com.techblog.common.constant.ResultCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.concurrent.ExecutionException;
+
 @RestController
 @RequestMapping("/posts")
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("/collect")
-    public CommonResponse collectPost(@RequestBody CollectPostIn collectPostIn) {
+    public CommonResponse collectPost(@RequestBody CollectPostIn collectPostIn) throws ExecutionException, InterruptedException {
         CollectPostOut collectPostOut = postService.collectPost(collectPostIn);
 
         return CommonResponse.ok(ResultCode.COLLECT_SUCCESS.getMessage(), ResultCode.COLLECT_SUCCESS.getDescription(),

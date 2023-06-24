@@ -15,10 +15,12 @@ import com.techblog.dao.mongodb.PostMongoEntity;
 import com.techblog.dao.mongodb.PostMongoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Component
@@ -52,7 +54,8 @@ public class NaverCollector implements Collector {
     }
 
     @Override
-    public CollectResult savePost(List<Post> externalNaverPostList) {
+    @Async("customThreadPoolExecutor")
+    public CompletableFuture<CollectResult> savePost(List<Post> externalNaverPostList) {
         log.info("[NaverCollector] savePost method is started");
         List<InternalNaverPost> internalNaverPostList = new ArrayList<>();
         List<InternalContent> internalContentList;
@@ -80,10 +83,12 @@ public class NaverCollector implements Collector {
         }
         log.info("[NaverCollector] savePost method is end");
 
-        return CollectResult.builder()
+        CollectResult collectResult = CollectResult.builder()
                 .savedPostCount(savedPostCount)
                 .executedTime(0L)
                 .build();
+
+        return CompletableFuture.completedFuture(collectResult);
     }
 
     @Override

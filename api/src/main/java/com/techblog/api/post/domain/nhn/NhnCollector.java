@@ -17,11 +17,13 @@ import com.techblog.dao.mongodb.PostMongoEntity;
 import com.techblog.dao.mongodb.PostMongoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,10 +58,11 @@ public class NhnCollector implements Collector {
     }
 
     @Override
-    public CollectResult savePost(List<Post> postList) {
+    @Async("customThreadPoolExecutor")
+    public CompletableFuture<CollectResult> savePost(List<Post> postList) {
         log.info("[NhnCollector] savePost method is started");
         List<InternalNhnPost> internalNhnPostList = new ArrayList<>();
-        List<InternalNhnContent> rightNhnContentVoList = new ArrayList<>();
+        List<InternalNhnContent> rightNhnContentVoList;
         int savedPostCount = 0;
 
         for (Post externalNhnPost : postList) {
@@ -81,10 +84,12 @@ public class NhnCollector implements Collector {
         }
         log.info("[NhnCollector] savePost method is end");
 
-        return CollectResult.builder()
+        CollectResult collectResult = CollectResult.builder()
                 .savedPostCount(savedPostCount)
                 .executedTime(0L)
                 .build();
+
+        return CompletableFuture.completedFuture(collectResult);
     }
 
     @Override
