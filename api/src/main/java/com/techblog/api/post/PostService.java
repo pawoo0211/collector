@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +25,7 @@ public class PostService {
     private final CollectManager collectManager;
     private final CompanyUrlJpaRepository companyUrlJpaRepository;
 
-    public CollectPostOut collectPost(CollectPostIn collectPostIn) throws ExecutionException, InterruptedException {
+    public CollectPostOut collectPost(CollectPostIn collectPostIn) {
         CollectResult collectResult = collectManager.collect(collectPostIn);
 
         return CollectPostOut.builder()

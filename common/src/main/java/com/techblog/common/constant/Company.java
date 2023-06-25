@@ -11,5 +11,4 @@ public enum Company {
     NHN("NHN");
 
     private final String name;
-
 }
