@@ -8,6 +8,7 @@ import com.techblog.api.post.out.SaveUrlOut;
 import com.techblog.api.post.out.SearchPostOut;
 import com.techblog.common.CommonResponse;
 import com.techblog.common.constant.ResultCode;
+import com.techblog.common.exception.domain.CustomAsyncException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,10 +23,14 @@ public class PostController {
 
     @PostMapping("/collect")
     public CommonResponse collectPost(@RequestBody CollectPostIn collectPostIn) throws ExecutionException, InterruptedException {
-        CollectPostOut collectPostOut = postService.collectPost(collectPostIn);
+        try {
+            CollectPostOut collectPostOut = postService.collectPost(collectPostIn);
 
-        return CommonResponse.ok(ResultCode.COLLECT_SUCCESS.getMessage(), ResultCode.COLLECT_SUCCESS.getDescription(),
-                collectPostOut);
+            return CommonResponse.ok(ResultCode.COLLECT_SUCCESS.getMessage(), ResultCode.COLLECT_SUCCESS.getDescription(),
+                    collectPostOut);
+        } catch (InterruptedException | ExecutionException e) {
+            throw new CustomAsyncException();
+        }
     }
 
     @GetMapping("/search")
