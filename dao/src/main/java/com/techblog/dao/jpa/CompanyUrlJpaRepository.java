@@ -1,5 +1,6 @@
 package com.techblog.dao.jpa;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,6 +10,7 @@ import java.util.List;
 public interface CompanyUrlJpaRepository extends JpaRepository<CompanyUrlJpaEntity, Long> {
 
     boolean existsByUrl(String url);
-    List<CompanyUrlJpaEntity> findAllByCompanyName(String companyName);
 
+    @Cacheable(value = "CompanyUrls", key = "#p0")
+    List<CompanyUrlJpaEntity> findAllByCompanyName(String companyName);
 }
