@@ -4,6 +4,7 @@ import com.techblog.api.post.in.CollectPostIn;
 import com.techblog.api.post.model.CollectResult;
 import com.techblog.api.post.model.Post;
 import com.techblog.common.constant.Company;
+import com.techblog.common.exception.domain.CustomAsyncException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,14 +34,10 @@ public class CollectManager implements InitializingBean {
         }
     }
 
-    /**
-     * 멀티 쓰레딩 처리 전 저장 소요 시간 : 15753ms
-     * 멀티 쓰레딩 처리 전 저장 소요 시간 : 14195ms
-     */
-    public CollectResult collect(CollectPostIn collectPostIn) throws ExecutionException, InterruptedException {
+    public CollectResult collect(CollectPostIn collectPostIn) {
         List<Company> companyList = collectPostIn.getCompanyList();
-        List<Collector> collectors = new ArrayList<>();
-        List<List<Post>> posts = new ArrayList<>();
+        List<Collector> collectorList = new ArrayList<>();
+        List<List<Post>> postLists = new ArrayList<>();
         CollectResult finalCollectResult = CollectResult.builder()
                 .savedPostCount(0)
                 .executedTime(0)
@@ -49,53 +46,45 @@ public class CollectManager implements InitializingBean {
         long startTime = System.currentTimeMillis();
 
         for (Company company : companyList) {
-            /**
-             * "List"의 특성인 index(순서)를 이용
-             * 변환까지는 동기 처리 후 글을 수집하는 것에서 비동기 처리 진행
-             */
             Collector collector = collectorMap.get(company);
             List<Post> postList = collector.toPost(company);
-            collectors.add(collector);
-            posts.add(postList);
+            collectorList.add(collector);
+            postLists.add(postList);
         }
 
         int postListCount = 0;
-        List<CompletableFuture<CollectResult>> completableFutures = new ArrayList<>();
+        List<CompletableFuture<CollectResult>> completableFutureList = new ArrayList<>();
 
-        for (Collector collector : collectors) {
-            /**
-             * 비동기 처리가 진행되기 전에 count + 1
-             */
-            List<Post> postList = posts.get(postListCount);
+        for (Collector collector : collectorList) {
+            List<Post> postList = postLists.get(postListCount);
             postListCount += 1;
 
-            /**
-             * TODO
-             * - 비동기 예외 처리
-             */
             CompletableFuture<CollectResult> collectResult = CompletableFuture.supplyAsync(
                     () -> collector.savePost(postList))
                     .thenApply(
                             result -> {
-                                CollectResult savedResult = null;
+                                CollectResult savedResult;
                                 try {
                                     savedResult = CollectResult.builder()
                                             .savedPostCount(result.get().getSavedPostCount())
                                             .executedTime(result.get().getExecutedTime())
                                             .build();
                                 } catch (InterruptedException | ExecutionException e) {
-                                    e.printStackTrace();
+                                    throw new CustomAsyncException();
                                 }
-
                                 return savedResult;
                             }
                     );
-            completableFutures.add(collectResult);
+            completableFutureList.add(collectResult);
         }
 
-        for (CompletableFuture<CollectResult> collectResult : completableFutures) {
-            int savedPostCount = finalCollectResult.getSavedPostCount() + collectResult.get().getSavedPostCount();
-            finalCollectResult.setSavedPostCount(savedPostCount);
+        for (CompletableFuture<CollectResult> collectResult : completableFutureList) {
+            try {
+                int savedPostCount = finalCollectResult.getSavedPostCount() + collectResult.get().getSavedPostCount();
+                finalCollectResult.setSavedPostCount(savedPostCount);
+            } catch (ExecutionException | InterruptedException e) {
+                throw new CustomAsyncException();
+            }
         }
 
         long executedTime = System.currentTimeMillis() - startTime;
