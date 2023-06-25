@@ -8,5 +8,4 @@ public interface PostMongoRepository extends MongoRepository<PostMongoEntity, St
 
     PostMongoEntity findByPostId(String postId);
     int countByCompanyName(String companyName);
-
 }
