@@ -1,6 +1,6 @@
 package com.techblog.api.config;
 
-import com.techblog.common.converter.StringToCompanyConverter;
+import com.techblog.api.converter.StringToCompanyConverter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;

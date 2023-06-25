@@ -8,5 +8,4 @@ public class ExternalNhnHeader {
     private boolean isSuccessful;
     private int resultCode;
     private String resultMessage;
-
 }

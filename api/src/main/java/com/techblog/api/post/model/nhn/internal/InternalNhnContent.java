@@ -10,14 +10,17 @@ public class InternalNhnContent {
     private String url;
     private String title;
     private String contentPreview;
+    private String regTime;
     private String publishTime;
 
     @Builder
-    public InternalNhnContent(int postId, String url, String title, String contentPreview, String publishTime) {
+    public InternalNhnContent(int postId, String url, String title, String contentPreview, String regTime,
+                              String publishTime) {
         this.postId = postId;
         this.url = url;
         this.title = title;
         this.contentPreview = contentPreview;
+        this.regTime = regTime;
         this.publishTime = publishTime;
     }
 }

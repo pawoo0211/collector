@@ -47,12 +47,12 @@ public class NhnCollector implements Collector {
 
         List<Post> externalNhnPostList = new ArrayList<>();
 
-        log.info("[NaverCollector] Data communication is started");
+        log.info("[NhnCollector] Data communication is started");
         for (String url : nhnPostUrlList) {
             ExternalNhnPost externalNhnPost = apiConnector.getHttpCall(url, ExternalNhnPost.class);
             externalNhnPostList.add(externalNhnPost);
         }
-        log.info("[NaverCollector] Data communication is end");
+        log.info("[NhnCollector] Data communication is end");
 
         return externalNhnPostList;
     }
@@ -77,6 +77,8 @@ public class NhnCollector implements Collector {
                     savedPostCount += saveRightContent(internalPostInfo.getContent());
                 }
                 break;
+            } else if (internalNhnPost.getContent().size() == 0) {
+                continue;
             } else {
                 rightNhnContentVoList = savePossibilityContent(internalNhnPost.getContent());
                 savedPostCount += saveRightContent(rightNhnContentVoList);
@@ -110,6 +112,7 @@ public class NhnCollector implements Collector {
                     .url(FIXED_NHN_URL + postId)
                     .title(externalNhnPostPerLang.getTitle())
                     .contentPreview(externalNhnPostVo.getContentPreview())
+                    .regTime(externalNhnPostPerLang.getRegTime())
                     .publishTime(externalNhnPostVo.getPublishTime())
                     .build();
 
@@ -124,12 +127,12 @@ public class NhnCollector implements Collector {
     private List<InternalNhnContent> savePossibilityContent(List<InternalNhnContent> internalNhnContentList) {
         List<InternalNhnContent> rightInternalContentVoList = new ArrayList<>();
         InternalNhnContent standardInternalNhnContent = internalNhnContentList.get(0);
-        final LocalDateTime STANDARD_PUBLISH_TIME = CustomDateTime.toLocalDateTime(standardInternalNhnContent.getPublishTime());
+        final LocalDateTime STANDARD_REGISTER_TIME = CustomDateTime.toLocalDateTime(standardInternalNhnContent.getRegTime());
 
         for (InternalNhnContent internalNhnContent : internalNhnContentList) {
-            LocalDateTime publishTime = CustomDateTime.toLocalDateTime(internalNhnContent.getPublishTime());
+            LocalDateTime registerTime = CustomDateTime.toLocalDateTime(internalNhnContent.getRegTime());
 
-            if (publishTime.isBefore(STANDARD_PUBLISH_TIME)) {
+            if (registerTime.isBefore(STANDARD_REGISTER_TIME)) {
                 continue;
             }
             rightInternalContentVoList.add(internalNhnContent);
