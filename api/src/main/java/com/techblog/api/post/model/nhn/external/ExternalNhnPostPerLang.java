@@ -7,5 +7,5 @@ public class ExternalNhnPostPerLang {
 
     private int postId;
     private String title;
-
+    private String regTime;
 }

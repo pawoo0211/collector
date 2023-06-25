@@ -16,5 +16,4 @@ public class ExternalNhnPost extends Post {
 
     @JsonProperty(value = "posts")
     private List<ExternalNhnPostVo> content;
-
 }

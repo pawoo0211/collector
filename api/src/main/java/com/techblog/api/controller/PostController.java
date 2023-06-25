@@ -22,7 +22,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("/collect")
-    public CommonResponse collectPost(@RequestBody CollectPostIn collectPostIn) throws ExecutionException, InterruptedException {
+    public CommonResponse collectPost(@RequestBody CollectPostIn collectPostIn) {
         try {
             CollectPostOut collectPostOut = postService.collectPost(collectPostIn);
 
